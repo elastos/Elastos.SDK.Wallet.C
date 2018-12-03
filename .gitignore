@@ -2,3 +2,6 @@
 /obj
 
 .DS_Store
+
+build
+tarball
