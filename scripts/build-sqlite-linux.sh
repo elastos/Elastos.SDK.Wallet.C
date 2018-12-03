@@ -7,14 +7,14 @@ print_usage()
 {
 	echo '
 NAME
-       build-sqlite-ios
+       build-sqlite-linux
 
 SYNOPSIS
-       build-sqlite-ios [options]
-       Example: ./build-sqlite-ios.sh
+       build-sqlite-linux [options]
+       Example: ./build-sqlite-linux.sh
 
 DESCRIPTION
-       Auto build sqlite for ios script.
+       Auto build sqlite for linux script.
 
 OPTIONS
        -h, --help
@@ -25,7 +25,7 @@ parse_options()
 {
 	options=$($CMD_GETOPT -o h \
 												--long "help" \
-												-n 'build-sqlite-ios' -- "$@");
+												-n 'build-sqlite-linux' -- "$@");
 	eval set -- "$options"
 	while true; do
 		case "$1" in
@@ -76,7 +76,6 @@ build_sqlite()
 
 	#export CFLAGS="-DSQLITE_NOHAVE_SYSTEM"
 	./configure --prefix=$OUTPUT_DIR/$ARCH \
-		--host=arm-apple-darwin \
 		--enable-static \
 		--disable-shared \
 		--disable-static-shell
@@ -86,7 +85,7 @@ build_sqlite()
 
 SCRIPT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd);
 source "$SCRIPT_DIR/base.sh";
-source "$SCRIPT_DIR/setenv-ios.sh";
+source "$SCRIPT_DIR/setenv-linux.sh";
 
 SQLITE_BASE_URL="https://www.sqlite.org/2018";
 SQLITE_VERSION="autoconf-3250300";
