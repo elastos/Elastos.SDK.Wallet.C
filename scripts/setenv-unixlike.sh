@@ -1,8 +1,8 @@
 #!/bin/bash
 
-BUILD_DIR="$BUILD_BASE_DIR/linux";
+BUILD_DIR="$BUILD_BASE_DIR/unixlike";
 TARBALL_DIR="$BUILD_BASE_DIR/tarball";
-OUTPUT_DIR="$BUILD_BASE_DIR/output/linux";
+OUTPUT_DIR="$BUILD_BASE_DIR/output/unixlike";
 mkdir -p "$TARBALL_DIR";
 
 if [ -z $(which clang) ]; then

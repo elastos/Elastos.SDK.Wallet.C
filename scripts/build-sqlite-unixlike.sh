@@ -7,14 +7,14 @@ print_usage()
 {
 	echo '
 NAME
-       build-sqlite-linux
+       build-sqlite-unixlike
 
 SYNOPSIS
-       build-sqlite-linux [options]
-       Example: ./build-sqlite-linux.sh
+       build-sqlite-unixlike [options]
+       Example: ./build-sqlite-unixlike.sh
 
 DESCRIPTION
-       Auto build sqlite for linux script.
+       Auto build sqlite for unixlike script.
 
 OPTIONS
        -h, --help
@@ -25,7 +25,7 @@ parse_options()
 {
 	options=$($CMD_GETOPT -o h \
 												--long "help" \
-												-n 'build-sqlite-linux' -- "$@");
+												-n 'build-sqlite-unixlike' -- "$@");
 	eval set -- "$options"
 	while true; do
 		case "$1" in
@@ -85,7 +85,7 @@ build_sqlite()
 
 SCRIPT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd);
 source "$SCRIPT_DIR/base.sh";
-source "$SCRIPT_DIR/setenv-linux.sh";
+source "$SCRIPT_DIR/setenv-unixlike.sh";
 
 SQLITE_BASE_URL="https://www.sqlite.org/2018";
 SQLITE_VERSION="autoconf-3250300";

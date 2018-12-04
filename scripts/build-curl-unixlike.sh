@@ -7,14 +7,14 @@ print_usage()
 {
 	echo '
 NAME
-       build-curl-linux
+       build-curl-unixlike
 
 SYNOPSIS
-       build-curl-linux [options]
-       Example: ./build-curl-linux.sh
+       build-curl-unixlike [options]
+       Example: ./build-curl-unixlike.sh
 
 DESCRIPTION
-       Auto build curl for linux script.
+       Auto build curl for unixlike script.
 
 OPTIONS
        -h, --help
@@ -25,7 +25,7 @@ parse_options()
 {
 	options=$($CMD_GETOPT -o h \
 												--long "help" \
-												-n 'build-curl-linux' -- "$@");
+												-n 'build-curl-unixlike' -- "$@");
 	eval set -- "$options"
 	while true; do
 		case "$1" in
@@ -99,7 +99,7 @@ build_curl()
 
 SCRIPT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd);
 source "$SCRIPT_DIR/base.sh";
-source "$SCRIPT_DIR/setenv-linux.sh";
+source "$SCRIPT_DIR/setenv-unixlike.sh";
 
 CURL_BASE_URL="https://curl.haxx.se/download";
 CURL_VERSION="7.62.0";
@@ -113,7 +113,7 @@ main_run()
 	parse_options $@;
 
 	# build openss first
-	"$SCRIPT_DIR/build-openssl-linux.sh"
+	"$SCRIPT_DIR/build-openssl-unixlike.sh"
 
 	cd "$PROJECT_DIR";
 	loginfo "change directory to $PROJECT_DIR";

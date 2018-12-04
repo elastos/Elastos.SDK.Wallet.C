@@ -7,14 +7,14 @@ print_usage()
 {
 	echo '
 NAME
-       build-openssl-linux
+       build-openssl-unixlike
 
 SYNOPSIS
-       build-openssl-linux [options]
-       Example: ./build-openssl-linux.sh
+       build-openssl-unixlike [options]
+       Example: ./build-openssl-unixlike.sh
 
 DESCRIPTION
-       Auto build openssl for linux script.
+       Auto build openssl for unixlike script.
 
 OPTIONS
        -h, --help
@@ -25,7 +25,7 @@ parse_options()
 {
 	options=$($CMD_GETOPT -o h \
 												--long "help" \
-												-n 'build-openssl-linux' -- "$@");
+												-n 'build-openssl-unixlike' -- "$@");
 	eval set -- "$options"
 	while true; do
 		case "$1" in
@@ -73,8 +73,7 @@ build_openssl()
 	fi
 	loginfo "$OPENSSL_TARBALL has been unpacked."
 	cd "$OPENSSL_BUILDDIR/$OPENSSL_NAME";
-	./Configure --prefix=$OUTPUT_DIR/$ARCH \
-		linux-x86_64-clang \
+	./config --prefix=$OUTPUT_DIR/$ARCH \
 		no-asm \
 		no-shared \
 		no-cast \
@@ -87,7 +86,7 @@ build_openssl()
 
 SCRIPT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd);
 source "$SCRIPT_DIR/base.sh";
-source "$SCRIPT_DIR/setenv-linux.sh";
+source "$SCRIPT_DIR/setenv-unixlike.sh";
 
 OPENSSL_BASE_URL="https://www.openssl.org/source";
 OPENSSL_VERSION="1.1.1a";
