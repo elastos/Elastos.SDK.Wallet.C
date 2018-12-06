@@ -52,9 +52,12 @@ elif [ ! -z $(which sysctl) ]; then
 	MAX_JOBS=$(sysctl -n hw.ncpu)
 fi
 
-SCRIPT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd);
+CURRENT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd);
+SCRIPT_DIR=$(dirname "$CURRENT_DIR");
 PROJECT_DIR=$(dirname "$SCRIPT_DIR");
 BUILD_BASE_DIR="$PROJECT_DIR/build";
+BUILD_ROOT_DIR="$BUILD_BASE_DIR/sysroot";
 
 DEBUG_VERBOSE=false;
 
+source "$CURRENT_DIR/tarball-config.sh";

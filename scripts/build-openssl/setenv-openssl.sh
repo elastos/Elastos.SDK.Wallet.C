@@ -7,14 +7,14 @@ print_usage()
 {
 	echo '
 NAME
-       build-openssl-ios
+       build-openssl
 
 SYNOPSIS
-       build-openssl-ios [options]
-       Example: ./build-openssl-ios.sh
+       build-openssl [options]
+       Example: ./build-openssl.sh
 
 DESCRIPTION
-       Auto build openssl for ios script.
+       Auto build openssl for script.
 
 OPTIONS
        -h, --help
@@ -25,7 +25,7 @@ parse_options()
 {
 	options=$($CMD_GETOPT -o h \
 												--long "help" \
-												-n 'build-openssl-ios' -- "$@");
+												-n 'build-openssl' -- "$@");
 	eval set -- "$options"
 	while true; do
 		case "$1" in
@@ -73,8 +73,7 @@ build_openssl()
 	fi
 	loginfo "$OPENSSL_TARBALL has been unpacked."
 	cd "$OPENSSL_BUILDDIR/$OPENSSL_NAME";
-	./Configure --prefix=$OUTPUT_DIR/$ARCH \
-		ios64-xcrun \
+	$@ --prefix=$OUTPUT_DIR/$ARCH \
 		no-asm \
 		no-shared \
 		no-cast \
@@ -85,17 +84,7 @@ build_openssl()
 	make install_dev
 }
 
-SCRIPT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd);
-source "$SCRIPT_DIR/base.sh";
-source "$SCRIPT_DIR/setenv-ios.sh";
-
-OPENSSL_BASE_URL="https://www.openssl.org/source";
-OPENSSL_VERSION="1.1.1a";
-OPENSSL_NAME="openssl-$OPENSSL_VERSION";
-OPENSSL_TARBALL="$OPENSSL_NAME.tar.gz";
-OPENSSL_BUILDDIR="$BUILD_DIR/openssl";
-
-main_run()
+prepare_build_openssl()
 {
 	loginfo "parsing options";
 	parse_options $@;
@@ -107,10 +96,10 @@ main_run()
 
 	mkdir -p "$OPENSSL_BUILDDIR" && cd "$OPENSSL_BUILDDIR";
 	download_tarball;
-
-	build_openssl;
-
-	loginfo "DONE !!!";
 }
 
-main_run $@;
+CURRENT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd);
+SCRIPT_DIR=$(dirname "$CURRENT_DIR");
+source "$SCRIPT_DIR/build-common/base.sh";
+
+OPENSSL_BUILDDIR="$BUILD_DIR/openssl";

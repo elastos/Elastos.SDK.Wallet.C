@@ -1,8 +1,13 @@
 #!/bin/bash
 
-BUILD_DIR="$BUILD_BASE_DIR/ios";
+CURRENT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd);
+source "$CURRENT_DIR/base.sh";
+
+SYSTEM_NAME="iOS"
+SYSTEM_ARCH="arm arm64"
+BUILD_DIR="$BUILD_BASE_DIR/$SYSTEM_NAME";
 TARBALL_DIR="$BUILD_BASE_DIR/tarball";
-OUTPUT_DIR="$BUILD_BASE_DIR/output/ios";
+OUTPUT_DIR="$BUILD_ROOT_DIR/$SYSTEM_NAME";
 mkdir -p "$TARBALL_DIR";
 
 XCODE="/Applications/Xcode.app/Contents/Developer"

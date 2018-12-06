@@ -7,14 +7,14 @@ print_usage()
 {
 	echo '
 NAME
-       build-sqlite-ios
+       build-sqlite
 
 SYNOPSIS
-       build-sqlite-ios [options]
-       Example: ./build-sqlite-ios.sh
+       build-sqlite [options]
+       Example: ./build-sqlite.sh
 
 DESCRIPTION
-       Auto build sqlite for ios script.
+       Auto build sqlite for script.
 
 OPTIONS
        -h, --help
@@ -25,7 +25,7 @@ parse_options()
 {
 	options=$($CMD_GETOPT -o h \
 												--long "help" \
-												-n 'build-sqlite-ios' -- "$@");
+												-n 'build-sqlite' -- "$@");
 	eval set -- "$options"
 	while true; do
 		case "$1" in
@@ -49,7 +49,7 @@ print_input_log()
 {
 	logtrace "*********************************************************";
 	logtrace " Input infomation";
-	logtrace "    sqlite version    : $SQLITE_VERSION";
+	logtrace "    sqlite version  : $SQLITE_VERSION";
 	logtrace "    debug verbose   : $DEBUG_VERBOSE";
 	logtrace "*********************************************************";
 }
@@ -76,25 +76,15 @@ build_sqlite()
 
 	#export CFLAGS="-DSQLITE_NOHAVE_SYSTEM"
 	./configure --prefix=$OUTPUT_DIR/$ARCH \
-		--host=arm-apple-darwin \
 		--enable-static \
 		--disable-shared \
-		--disable-static-shell
+		--disable-static-shell \
+		$@
 
 	make -j$MAX_JOBS libsqlite3.la && make install-libLTLIBRARIES install-includeHEADERS install-pkgconfigDATA
 }
 
-SCRIPT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd);
-source "$SCRIPT_DIR/base.sh";
-source "$SCRIPT_DIR/setenv-ios.sh";
-
-SQLITE_BASE_URL="https://www.sqlite.org/2018";
-SQLITE_VERSION="autoconf-3250300";
-SQLITE_NAME="sqlite-$SQLITE_VERSION";
-SQLITE_TARBALL="$SQLITE_NAME.tar.gz";
-SQLITE_BUILDDIR="$BUILD_DIR/sqlite";
-
-main_run()
+prepare_build_sqlite()
 {
 	loginfo "parsing options";
 	parse_options $@;
@@ -109,10 +99,11 @@ main_run()
 
 	mkdir -p "$SQLITE_BUILDDIR" && cd "$SQLITE_BUILDDIR";
 	download_tarball;
-
-	build_sqlite;
-
-	loginfo "DONE !!!";
 }
 
-main_run $@;
+CURRENT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd);
+SCRIPT_DIR=$(dirname "$CURRENT_DIR");
+source "$SCRIPT_DIR/build-common/base.sh";
+
+SQLITE_BUILDDIR="$BUILD_DIR/sqlite";
+

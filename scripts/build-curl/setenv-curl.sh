@@ -7,14 +7,14 @@ print_usage()
 {
 	echo '
 NAME
-       build-curl-unixlike
+       build-curl
 
 SYNOPSIS
-       build-curl-unixlike [options]
-       Example: ./build-curl-unixlike.sh
+       build-curl [options]
+       Example: ./build-curl.sh
 
 DESCRIPTION
-       Auto build curl for unixlike script.
+       Auto build curl for script.
 
 OPTIONS
        -h, --help
@@ -25,7 +25,7 @@ parse_options()
 {
 	options=$($CMD_GETOPT -o h \
 												--long "help" \
-												-n 'build-curl-unixlike' -- "$@");
+												-n 'build-curl' -- "$@");
 	eval set -- "$options"
 	while true; do
 		case "$1" in
@@ -89,7 +89,8 @@ build_curl()
 		--disable-smb \
 		--disable-smtp \
 		--disable-telnet \
-		--disable-tftp
+		--disable-tftp \
+		$@
 
 	make -j$MAX_JOBS -C lib libcurl.la && \
 	make -C lib install-libLTLIBRARIES && \
@@ -97,23 +98,10 @@ build_curl()
 	make install-pkgconfigDATA
 }
 
-SCRIPT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd);
-source "$SCRIPT_DIR/base.sh";
-source "$SCRIPT_DIR/setenv-unixlike.sh";
-
-CURL_BASE_URL="https://curl.haxx.se/download";
-CURL_VERSION="7.62.0";
-CURL_NAME="curl-$CURL_VERSION";
-CURL_TARBALL="$CURL_NAME.tar.gz";
-CURL_BUILDDIR="$BUILD_DIR/curl";
-
-main_run()
+prepare_build_curl()
 {
 	loginfo "parsing options";
 	parse_options $@;
-
-	# build openss first
-	"$SCRIPT_DIR/build-openssl-unixlike.sh"
 
 	cd "$PROJECT_DIR";
 	loginfo "change directory to $PROJECT_DIR";
@@ -122,10 +110,11 @@ main_run()
 
 	mkdir -p "$CURL_BUILDDIR" && cd "$CURL_BUILDDIR";
 	download_tarball;
-
-	build_curl;
-
-	loginfo "DONE !!!";
 }
 
-main_run $@;
+
+CURRENT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd);
+SCRIPT_DIR=$(dirname "$CURRENT_DIR");
+source "$SCRIPT_DIR/build-common/base.sh";
+
+CURL_BUILDDIR="$BUILD_DIR/curl";
