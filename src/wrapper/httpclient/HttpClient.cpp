@@ -284,7 +284,7 @@ size_t HttpClient::CurlReadCallback(char* buffer, size_t size, size_t nitems, vo
 	return -1;
 }
 
-int HttpClient::MakeCurl(std::shared_ptr<CURL>& curlHandlePtr, std::shared_ptr<struct curl_slist>& curlHeadersPtr) const
+int HttpClient::MakeCurl(std::shared_ptr<void>& curlHandlePtr, std::shared_ptr<struct curl_slist>& curlHeadersPtr) const
 {
 	CURLcode curle;
 

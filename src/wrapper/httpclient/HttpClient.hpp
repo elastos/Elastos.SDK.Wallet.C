@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include <curl/curl.h>
+struct curl_slist;
 
 namespace elastos {
 
@@ -73,7 +73,7 @@ private:
 	static size_t CurlReadCallback(char* buffer, size_t size, size_t nitems, void* userdata);
 
   /*** class function and variable ***/
-	int MakeCurl(std::shared_ptr<CURL>& curlHandlePtr, std::shared_ptr<struct curl_slist>& curlHeadersPtr) const;
+	int MakeCurl(std::shared_ptr<void>& curlHandlePtr, std::shared_ptr<struct curl_slist>& curlHeadersPtr) const;
 	int AddHeader(HeaderMap& headers,
 				  const std::string& name, const std::string& value) const;
 
