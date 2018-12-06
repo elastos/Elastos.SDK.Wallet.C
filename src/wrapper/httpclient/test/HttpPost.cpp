@@ -27,10 +27,10 @@ int main( int argc, char **argv )
 
 	std::string body;
 	body.append("{");
-	body.append("\"inputs\"  : [\"EPzxJrHefvE7TCWmEGQ4rcFgxGeGBZFSHw\"],");
-	body.append("\"outputs\" : [{");
+	body.append("\"inputs\":[\"EPzxJrHefvE7TCWmEGQ4rcFgxGeGBZFSHw\"],");
+	body.append("\"outputs\":[{");
 	body.append("\"addr\":\"EPzxJrHefvE7TCWmEGQ4rcFgxGeGBZFSHw\",");
-	body.append("\"amt\" :0");
+	body.append("\"amt\":0");
 	body.append("}]");
 	body.append("}");
 	std::cout << "body: " << body << std::endl;
@@ -38,7 +38,7 @@ int main( int argc, char **argv )
 	ret = httpClient.SyncPost(body);
 	std::cout << "return code2: " << ret << std::endl;
 
-	ret = httpClient.SyncPost(reinterpret_cast<const int8_t*>(body.data()), body.length());
+	ret = httpClient.SyncPost(reinterpret_cast<const int8_t*>(body.c_str()), body.length());
 	std::cout << "return code: " << ret << std::endl;
 
 	ret = httpClient.GetResponseStatus();
