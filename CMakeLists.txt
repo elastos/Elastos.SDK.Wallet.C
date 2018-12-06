@@ -17,6 +17,11 @@ endif()
 find_package(PkgConfig REQUIRED)
 set(ENV{PKG_CONFIG_PATH} "${BUILD_ROOT}/lib/pkgconfig")
 
+include_directories(
+  ${PROJECT_SOURCE_DIR}/src
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR})
+
 add_subdirectory(src)
 
 message(STATUS "****************************")
