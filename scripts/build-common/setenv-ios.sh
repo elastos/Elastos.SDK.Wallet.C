@@ -5,9 +5,9 @@ source "$CURRENT_DIR/base.sh";
 
 SYSTEM_NAME="iOS"
 SYSTEM_ABIS=(arm64 x86_64)
-BUILD_DIR="$BUILD_BASE_DIR/$SYSTEM_NAME/$TARGET_ARCH";
+BUILD_DIR="$BUILD_BASE_DIR/$SYSTEM_NAME/$TARGET_ABI";
 TARBALL_DIR="$BUILD_BASE_DIR/tarball";
-OUTPUT_DIR="$BUILD_ROOT_DIR/$SYSTEM_NAME/$TARGET_ARCH";
+OUTPUT_DIR="$BUILD_ROOT_DIR/$SYSTEM_NAME/$TARGET_ABI";
 mkdir -p "$TARBALL_DIR";
 
 XCODE="/Applications/Xcode.app/Contents/Developer"
@@ -16,14 +16,14 @@ if [ ! -d "$XCODE" ]; then
 	exit 1
 fi
 
-export CC="$XCODE/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
 export IPHONEOS_DEPLOYMENT_TARGET="8"
 
 ARCH_LIST=(arm64 x86_64)
 PLATFORM_LIST=(iPhoneOS iPhoneSimulator)
-SDK_LIST=(iPhoneOS12.1 iPhoneSimulator12.1)
+TOOLCHAIN_LIST=(aarch64-apple-darwin x86_64-apple-darwin)
+SDK_LIST=(iPhoneOS iPhoneSimulator)
 for idx in "${!SYSTEM_ABIS[@]}"; do
-	if [[ "${SYSTEM_ABIS[$idx]}" = "${TARGET_ARCH}" ]]; then
+	if [[ "${SYSTEM_ABIS[$idx]}" = "${TARGET_ABI}" ]]; then
 		LIST_IDX=${idx}
 		break;
 	fi
@@ -36,3 +36,16 @@ export LDFLAGS="-arch ${ARCH_LIST[$LIST_IDX]} -isysroot $SYSROOT"
 if [ "${PLATFORM_LIST[$LIST_IDX]}" = "iPhoneSimulator" ]; then
 	export CPPFLAGS="-D__IPHONE_OS_VERSION_MIN_REQUIRED=${IPHONEOS_DEPLOYMENT_TARGET%%.*}0000"
 fi
+
+IOS_TOOLCHAIN=${TOOLCHAIN_LIST[$LIST_IDX]};
+
+echo "===================================";
+echo "ARCH:       ${ARCH}";
+echo "PLATFORM:   ${PLATFORM_LIST[$LIST_IDX]}";
+echo "TOOLCHAIN:  ${IOS_TOOLCHAIN}";
+echo "SDK:        ${SDK_LIST[$LIST_IDX]}";
+echo "===================================";
+
+#export CC="$XCODE/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+export CC=clang
+export CXX=clang++

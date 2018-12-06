@@ -7,7 +7,7 @@ download_tarball()
 {
 	if [ ! -e "$TARBALL_DIR/.$SQLITE_NAME" ]; then
 		sqlite_url="$SQLITE_BASE_URL/$SQLITE_TARBALL";
-		echo sqlite "$sqlite_url" --output "$TARBALL_DIR/$SQLITE_TARBALL";
+		echo curl "$sqlite_url" --output "$TARBALL_DIR/$SQLITE_TARBALL";
 		curl "$sqlite_url" --output "$TARBALL_DIR/$SQLITE_TARBALL";
 		echo "$sqlite_url" > "$TARBALL_DIR/.$SQLITE_NAME";
 	fi
@@ -19,8 +19,6 @@ build_sqlite()
 {
 	mkdir -p "$SQLITE_BUILDDIR" && cd "$SQLITE_BUILDDIR";
 	loginfo "change directory to $SQLITE_BUILDDIR";
-
-	print_input_log;
 
 	if [ ! -e "$SQLITE_BUILDDIR/$SQLITE_NAME" ]; then
 		tar xf "$TARBALL_DIR/$SQLITE_TARBALL";
@@ -38,8 +36,37 @@ build_sqlite()
 	make -j$MAX_JOBS libsqlite3.la && make install-libLTLIBRARIES install-includeHEADERS install-pkgconfigDATA
 }
 
-CURRENT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd);
-SCRIPT_DIR=$(dirname "$CURRENT_DIR");
+main_run()
+{
+	loginfo "parsing options";
+	parse_options $@;
 
-SQLITE_BUILDDIR="$BUILD_DIR/sqlite";
+	case "$TARGET_PLATFORM" in
+		(Android)
+			source "$SCRIPT_DIR/build-common/setenv-android.sh";
+			CONFIG_PARAM="--host=$ANDROID_TOOLCHAIN --target=$ANDROID_TOOLCHAIN";
+			;;
+		(iOS)
+			source "$SCRIPT_DIR/build-common/setenv-ios.sh";
+			CONFIG_PARAM="--host=$IOS_TOOLCHAIN --target=$IOS_TOOLCHAIN";
+			;;
+		(*)
+			source "$SCRIPT_DIR/build-common/setenv-unixlike.sh";
+			CONFIG_PARAM=;
+			;;
+	esac
 
+	SQLITE_BUILDDIR="$BUILD_DIR/sqlite";
+
+	download_tarball;
+
+	build_sqlite $CONFIG_PARAM;
+
+	loginfo "DONE !!!";
+}
+
+SCRIPT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd);
+
+source "$SCRIPT_DIR/build-common/getopt.sh";
+
+main_run $@;
