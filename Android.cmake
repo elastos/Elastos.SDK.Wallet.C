@@ -5,6 +5,7 @@ if ("${ANDROID_NDK_HOME}" STREQUAL "")
 	message(FATAL_ERROR "Fatal: ANDROID_NDK_HOME is not valid.")
 endif()
 
+set(CMAKE_CROSSCOMPILING TRUE)
 set(CMAKE_SYSTEM_NAME Android)
 
 #choose Android version. This is not the version of Cmake.

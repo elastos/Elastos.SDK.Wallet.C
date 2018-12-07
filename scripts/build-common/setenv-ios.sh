@@ -46,6 +46,6 @@ echo "TOOLCHAIN:  ${IOS_TOOLCHAIN}";
 echo "SDK:        ${SDK_LIST[$LIST_IDX]}";
 echo "===================================";
 
-#export CC="$XCODE/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+export PATH="$XCODE/Toolchains/XcodeDefault.xctoolchain/usr/bin:$PATH"
 export CC=clang
 export CXX=clang++

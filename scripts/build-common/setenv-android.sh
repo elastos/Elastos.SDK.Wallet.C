@@ -48,13 +48,6 @@ fi
 export PATH="$ANDROID_TOOLCHAIN_PATH/bin:$PATH"
 export CC=clang
 export CXX=clang++
-#export AR=$ANDROID_TOOLCHAIN-ar
-#export LINKER=$ANDROID_TOOLCHAIN-ld
-#export NM=$ANDROID_TOOLCHAIN-nm
-#export OBJDUMP=$ANDROID_TOOLCHAIN-objdump
-#export RANLIB=$ANDROID_TOOLCHAIN-ranlib
-#export STRIP=$ANDROID_TOOLCHAIN-strip
-
 export CFLAGS="-D__ANDROID_API__=$ANDROID_SDK"
 export CPPFLAGS="-D__ANDROID_API__=$ANDROID_SDK"
 

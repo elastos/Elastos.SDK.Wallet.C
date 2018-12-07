@@ -2,6 +2,8 @@
 #ifndef __DID_H__
 #define __DID_H__
 
+#include <string>
+
 class Did
 {
 public:

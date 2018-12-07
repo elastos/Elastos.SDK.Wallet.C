@@ -2,9 +2,10 @@
 #ifndef __CHISTORY_DATABASE_H__
 #define __CHISTORY_DATABASE_H__
 
-#include "sqlite3.h"
 #include <string>
 #include <vector>
+
+struct sqlite3;
 
 namespace elastos{
 

@@ -4,6 +4,7 @@
 #include "common/Utils.h"
 #include "common/Log.hpp"
 #include <sstream>
+#include <sqlite3.h>
 
 namespace elastos {
 
