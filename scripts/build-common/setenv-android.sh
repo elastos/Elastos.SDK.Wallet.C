@@ -22,7 +22,7 @@ fi
 
 SDK_LIST=(19 21 21)
 ARCH_LIST=(arm arm64 x86_64)
-TOOLCHAIN_LIST=(arm-linux-android aarch64-linux-android x86_64-linux-android)
+TOOLCHAIN_LIST=(arm-linux-androideabi aarch64-linux-android x86_64-linux-android)
 for idx in "${!SYSTEM_ABIS[@]}"; do
 	if [[ "${SYSTEM_ABIS[$idx]}" = "${TARGET_ABI}" ]]; then
 		LIST_IDX=${idx}
@@ -45,14 +45,21 @@ if [ ! -e "$BUILD_DIR/.toolchain" ]; then
 	touch "$BUILD_DIR/.toolchain";
 fi
 
+export PATH="$ANDROID_TOOLCHAIN_PATH/bin:$PATH"
+export CC=clang
+export CXX=clang++
+#export AR=$ANDROID_TOOLCHAIN-ar
+#export LINKER=$ANDROID_TOOLCHAIN-ld
+#export NM=$ANDROID_TOOLCHAIN-nm
+#export OBJDUMP=$ANDROID_TOOLCHAIN-objdump
+#export RANLIB=$ANDROID_TOOLCHAIN-ranlib
+#export STRIP=$ANDROID_TOOLCHAIN-strip
+
+export CFLAGS="-D__ANDROID_API__=$ANDROID_SDK"
+export CPPFLAGS="-D__ANDROID_API__=$ANDROID_SDK"
+
 echo "===================================";
 echo "ARCH:       ${ARCH_LIST[$LIST_IDX]}";
 echo "SDK:        ${ANDROID_SDK}";
 echo "TOOLCHAIN:  ${ANDROID_TOOLCHAIN}";
 echo "===================================";
-
-export PATH="$ANDROID_TOOLCHAIN_PATH/bin:$PATH"
-export CC=clang
-export CXX=clang++
-export CFLAGS="-D__ANDROID_API__=$ANDROID_SDK"
-

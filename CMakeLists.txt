@@ -1,31 +1,45 @@
 cmake_minimum_required(VERSION 3.10)
 
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 include(BuildType.cmake)
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_C_STANDARD_REQUIRED ON)
+if("${TARGET_PLATFORM}" STREQUAL "Android")
+	if (NOT DEFINED TARGET_ABI)
+		set(TARGET_ABI "armeabi-v7a")
+	endif()
+	include(Android.cmake)
+elseif("${TARGET_PLATFORM}" STREQUAL "iOS")
+	if (NOT DEFINED TARGET_ABI)
+		set(TARGET_ABI "arme64")
+	endif()
+	include(iOS.cmake)
+else()
+	if (NOT DEFINED TARGET_PLATFORM)
+		set(TARGET_PLATFORM "${CMAKE_SYSTEM_NAME}")
+	endif()
+	if (NOT DEFINED TARGET_ABI)
+		set(TARGET_ABI "x86_64")
+	endif()
+endif()
 
-set(SYSTEM_NAME "${CMAKE_SYSTEM_NAME}")
-set(SYSTEM_ARCH "${CMAKE_SYSTEM_PROCESSOR}")
-
+# enable pkg-config and set pkg-config find path
 if (NOT DEFINED BUILD_ROOT)
-	set(BUILD_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/build/sysroot/${SYSTEM_NAME}/${SYSTEM_ARCH}")
+	set(BUILD_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/build/sysroot/${TARGET_PLATFORM}/${TARGET_ABI}")
 endif()
 find_package(PkgConfig REQUIRED)
 set(ENV{PKG_CONFIG_PATH} "${BUILD_ROOT}/lib/pkgconfig")
 
-include_directories(
-  ${PROJECT_SOURCE_DIR}/src
-  ${CMAKE_CURRENT_BINARY_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR})
+message(STATUS "********************************************")
+message(STATUS "TARGET_PLATFORM : ${TARGET_PLATFORM}")
+message(STATUS "TARGET_ABI      : ${TARGET_ABI}")
+message(STATUS "BUILD_ROOT      : ${BUILD_ROOT}")
+message(STATUS "*********************************************")
 
+project(Elastos.SDK.Wallet.C)
 add_subdirectory(src)
 
-message(STATUS "****************************")
-message(STATUS "SYSTEM_NAME : ${SYSTEM_NAME}")
-message(STATUS "SYSTEM_ARCH : ${SYSTEM_ARCH}")
-message(STATUS "BUILD_ROOT  : ${BUILD_ROOT}")
-message(STATUS "****************************")

@@ -44,7 +44,7 @@ build_curl()
 		--disable-tftp \
 		$@
 
-	make -j$MAX_JOBS -C lib libcurl.la && \
+	make -j$MAX_JOBS -C lib libcurl.la V=1 && \
 	make -C lib install-libLTLIBRARIES && \
 	make -C include/curl install-pkgincludeHEADERS && \
 	make install-pkgconfigDATA
@@ -52,6 +52,10 @@ build_curl()
 
 main_run()
 {
+
+	# build openssl first.
+	"$SCRIPT_DIR/build-openssl.sh" $@;
+
 	loginfo "parsing options";
 	parse_options $@;
 

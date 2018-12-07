@@ -311,14 +311,14 @@ int HttpClient::MakeCurl(std::shared_ptr<void>& curlHandlePtr, std::shared_ptr<s
 
 	struct curl_slist* curlHeaders = nullptr;
 	bool hasAcceptEncoding = false;
-	for (auto& kv : mReqHeaders) {
-		auto& name = kv.first;
-		for(auto& value: kv.second) {
+	for (auto& [key, val]: mReqHeaders) {
+		auto& name = key;
+		for(auto& value: val) {
 			std::string header = (name + ": " + value);
 			curlHeaders = curl_slist_append(curlHeaders, header.c_str());
 		}
 
-		if(kv.first == "Accept-Encoding") {
+		if(key == "Accept-Encoding") {
 			hasAcceptEncoding = true;
 		}
 	}
