@@ -5,9 +5,9 @@ source "$CURRENT_DIR/base.sh";
 
 SYSTEM_NAME="iOS"
 SYSTEM_ABIS=(arm64 x86_64)
-BUILD_DIR="$BUILD_BASE_DIR/$SYSTEM_NAME/$TARGET_ABI";
+BUILD_DIR="$BUILD_BASE_DIR/$SYSTEM_NAME/$CFG_TARGET_ABI";
 TARBALL_DIR="$BUILD_BASE_DIR/tarball";
-OUTPUT_DIR="$BUILD_ROOT_DIR/$SYSTEM_NAME/$TARGET_ABI";
+OUTPUT_DIR="$BUILD_ROOT_DIR/$SYSTEM_NAME/$CFG_TARGET_ABI";
 mkdir -p "$TARBALL_DIR";
 
 XCODE="/Applications/Xcode.app/Contents/Developer"
@@ -23,7 +23,7 @@ PLATFORM_LIST=(iPhoneOS iPhoneSimulator)
 TOOLCHAIN_LIST=(aarch64-apple-darwin x86_64-apple-darwin)
 SDK_LIST=(iPhoneOS iPhoneSimulator)
 for idx in "${!SYSTEM_ABIS[@]}"; do
-	if [[ "${SYSTEM_ABIS[$idx]}" = "${TARGET_ABI}" ]]; then
+	if [[ "${SYSTEM_ABIS[$idx]}" = "${CFG_TARGET_ABI}" ]]; then
 		LIST_IDX=${idx}
 		break;
 	fi

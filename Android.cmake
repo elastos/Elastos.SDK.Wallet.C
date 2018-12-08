@@ -1,6 +1,3 @@
-if (NOT DEFINED ANDROID_NDK_HOME)
-	set(ANDROID_NDK_HOME $ENV{ANDROID_NDK_HOME})
-endif()
 if ("${ANDROID_NDK_HOME}" STREQUAL "")
 	message(FATAL_ERROR "Fatal: ANDROID_NDK_HOME is not valid.")
 endif()

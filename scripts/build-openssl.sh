@@ -39,19 +39,19 @@ build_openssl()
 main_run()
 {
 	loginfo "parsing options";
-	parse_options $@;
+	getopt_parse_options $@;
 
-	case "$TARGET_PLATFORM" in
+	case "$CFG_TARGET_PLATFORM" in
 		(Android)
 			source "$SCRIPT_DIR/build-common/setenv-android.sh";
 			export ANDROID_NDK="$ANDROID_TOOLCHAIN_PATH";
-			local arch=${TARGET_ABI%-*};
+			local arch=${CFG_TARGET_ABI%-*};
 			arch=${arch%eabi};
 			CONFIG_PARAM="./Configure android-$arch";
 			;;
 		(iOS)
 			source "$SCRIPT_DIR/build-common/setenv-ios.sh";
-			[[ "$TARGET_ABI" = "x86_64" ]] && arch="iossimulator" || arch="ios64"
+			[[ "$CFG_TARGET_ABI" = "x86_64" ]] && arch="iossimulator" || arch="ios64"
 			CONFIG_PARAM="./Configure $arch-xcrun"
 
 			;;

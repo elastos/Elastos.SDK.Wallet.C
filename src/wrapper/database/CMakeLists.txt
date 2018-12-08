@@ -8,6 +8,8 @@ target_include_directories(database PRIVATE "${pkg-sqlite3_INCLUDE_DIRS}")
 target_link_libraries(database common)
 target_link_libraries(database ${pkg-sqlite3_STATIC_LDFLAGS})
 
-add_executable(test-db test/DatabaseTest.cpp)
-target_link_libraries(test-db database)
+if(DEFINED CFG_WITH_TEST)
+	add_executable(test-db test/DatabaseTest.cpp)
+	target_link_libraries(test-db database)
+endif()
 

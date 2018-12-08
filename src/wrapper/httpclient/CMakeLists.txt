@@ -11,9 +11,10 @@ target_include_directories(httpclient PRIVATE "${pkg-curl_INCLUDE_DIRS}")
 target_link_libraries(httpclient common)
 target_link_libraries(httpclient ${pkg-curl_STATIC_LDFLAGS})
 
+if(DEFINED CFG_WITH_TEST)
+	add_executable(test-httpget test/HttpGet.cpp)
+	target_link_libraries(test-httpget httpclient)
 
-add_executable(test-httpget test/HttpGet.cpp)
-target_link_libraries(test-httpget httpclient)
-
-add_executable(test-httppost test/HttpPost.cpp)
-target_link_libraries(test-httppost httpclient)
+	add_executable(test-httppost test/HttpPost.cpp)
+	target_link_libraries(test-httppost httpclient)
+endif()

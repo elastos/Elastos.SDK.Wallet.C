@@ -57,9 +57,9 @@ main_run()
 	"$SCRIPT_DIR/build-openssl.sh" $@;
 
 	loginfo "parsing options";
-	parse_options $@;
+	getopt_parse_options $@;
 
-	case "$TARGET_PLATFORM" in
+	case "$CFG_TARGET_PLATFORM" in
 		(Android)
 			source "$SCRIPT_DIR/build-common/setenv-android.sh";
 			CONFIG_PARAM="--host=$ANDROID_TOOLCHAIN --target=$ANDROID_TOOLCHAIN";

@@ -40,11 +40,6 @@ trim() {
 	echo -n "$var"
 }
 
-CMD_GETOPT="getopt";
-if [ "$(uname -s)" == "Darwin" ]; then
-	CMD_GETOPT="/usr/local/Cellar/gnu-getopt/1.1.6/bin/getopt";
-fi
-
 MAX_JOBS=2
 if [ -f /proc/cpuinfo ]; then
 	MAX_JOBS=$(grep flags /proc/cpuinfo |wc -l)
