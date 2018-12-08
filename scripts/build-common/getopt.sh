@@ -16,7 +16,7 @@ getopt_parse_options()
 	type getopt_extfunc_options &>/dev/null && local ret=$(getopt_extfunc_options) && getopt_ext=(${ret//;/ });
 
 	local args="--name getopt-script --options p:m:${getopt_ext[0]}h --longoptions platform:,arch:,${getopt_ext[1]},help";
-	echo "getopt args: $args";
+	#echo "getopt args: $args";
 
 	if [[ $GETOPT_IGNORE_UNRECOGNIZED  == true ]]; then
 		local getopt_opts=$($getopt_cmd --quiet $args -- "$@");
