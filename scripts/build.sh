@@ -65,7 +65,7 @@ build_project()
 		$cmake_ext_args;
 
 	if [[ $CFG_IGNORE_BUILD == false ]]; then
-		make -j$MAX_JOBS  && make install;
+		make -j$MAX_JOBS && make install;
 	fi
 }
 

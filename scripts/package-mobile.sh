@@ -15,11 +15,12 @@ build_all()
 	local target_abi_type=$((${#target_abis[@]} / ${#target_platforms[@]}));
 
 	for pidx in "${!target_platforms[@]}"; do
+		local platform="${target_platforms[pidx]}";
+
 		for (( tidx = 0; tidx < $target_abi_type; tidx++)); do
-			aidx=$((${target_abi_type} * ${pidx} + ${tidx}));
+			local aidx=$((${target_abi_type} * ${pidx} + ${tidx}));
 			#echo "==========================$aidx";
-			platform="${target_platforms[pidx]}";
-			abi="${target_abis[aidx]}";
+			local abi="${target_abis[aidx]}";
 			if [[ "$abi" == "-" ]]; then
 				continue;
 			fi
@@ -30,6 +31,19 @@ build_all()
 	done
 }
 
+make_android_manifest()
+{
+	local package_name=$1;
+	local manifest_xml=$2;
+
+	echo '<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="'$package_name'">
+    <uses-sdk android:minSdkVersion="19" android:targetSdkVersion="21"/>
+</manifest>' \
+	> "$manifest_xml";
+}
+
 package_android()
 {
 	local pkg_android_dir="$PACKAGE_DIR/Android";
@@ -38,10 +52,17 @@ package_android()
 	for abi in $abi_list; do
 		mkdir -p "$pkg_android_dir/jni/$abi";
 		cp -rv "$BUILD_ROOT_DIR/Android/$abi/lib/lib"*.a "$pkg_android_dir/jni/$abi/";
+
+		mkdir -p "$pkg_android_dir/jni/include";
+		cp -rv "$BUILD_ROOT_DIR/Android/$abi/include/$PROJECT_NAME/"* "$pkg_android_dir/jni/include/";
 	done
 
+	local package_name="org.elastos.sdk.wallet.c";
+	make_android_manifest "$package_name" "$pkg_android_dir/AndroidManifest.xml";
+
 	cd "$pkg_android_dir";
-	zip -r "${PACKAGE_DIR}/${PROJECT_NAME}.aar" *;
+	zip -r "${PACKAGE_DIR}/${PROJECT_NAME}.aar" jni AndroidManifest.xml;
+	#jar cvf "${PACKAGE_DIR}/${PROJECT_NAME}.aar" -C "$pkg_android_dir" jni AndroidManifest.xml;
 	loginfo "Success to create ${PACKAGE_DIR}/${PROJECT_NAME}.aar";
 }
 
@@ -63,9 +84,9 @@ package_ios()
 	done
 
 	echo "Creating ${PROJECT_NAME}.framework"
+	cd "$pkg_ios_dir/";
 	mkdir -p "${PACKAGE_DIR}/${PROJECT_NAME}.framework/Headers";
 	#cp -r include/$PROJECT_NAME/* $PROJECT_NAME.framework/Headers/
-	cd "$pkg_ios_dir/";
 	lipo -create ${package_list[@]} -output "$PACKAGE_DIR/${PROJECT_NAME}.framework/${PROJECT_NAME}"
 
 	loginfo "Success to create ${PACKAGE_DIR}/${PROJECT_NAME}.framework";
@@ -73,7 +94,7 @@ package_ios()
 
 main_run()
 {
-#	build_all;
+	build_all;
 
 	loginfo "Remove previous packages in $PACKAGE_DIR";
 	rm -rf "$PACKAGE_DIR";
