@@ -7,7 +7,7 @@
 
 struct sqlite3;
 
-namespace elastos{
+namespace elastos {
 
 struct History
 {
@@ -26,20 +26,18 @@ struct History
 class CHistoryDb
 {
 public:
-    CHistoryDb(std::string filePath, std::string tableName);
+    CHistoryDb(const std::string& filePath, const std::string& tableName);
 
     ~CHistoryDb();
 
     int Insert(const std::vector<History>& histories);
 
-    int Delete(std::string txid, std::string address);
+    int Delete(const std::string& txid, const std::string& address);
 
-    int Query(std::string address, std::vector<History*>* pHistories);
+    int Query(const std::string& address, std::vector<History*>* pHistories);
 
 private:
     void CloseDb();
-
-    bool TableExist(std::string tableName);
 
     std::string CreateInsertSql(const History& history);
 

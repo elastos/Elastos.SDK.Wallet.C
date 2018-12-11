@@ -1,11 +1,23 @@
 
 #include "CHistoryDb.h"
 #include "SqliteWrapperError.h"
+#include "CDidDb.h"
 
 using namespace elastos;
 
+void TestHistory();
+void TestDid();
+
 int main(int argc, char** argv)
 {
+    TestHistory();
+
+    TestDid();
+
+    return 0;
+}
+
+void TestHistory() {
     CHistoryDb historyDb("/Users/nathansfile/Elastos.SDK.Wallet.C/obj", "testTable");
 
     History history;
@@ -37,7 +49,7 @@ int main(int argc, char** argv)
     int ret = historyDb.Insert(histories);
     if (ret != E_SQL_WRAPPER_OK) {
         printf("insert failed %d\n", ret);
-        return ret;
+        return;
     }
 
     std::vector<History*> query;
@@ -66,6 +78,54 @@ int main(int argc, char** argv)
     if (ret != E_SQL_WRAPPER_OK) {
         printf("delete failed %d\n", ret);
     }
-
-    return 0;
 }
+
+void TestDid()
+{
+    CDidDb didDb("/Users/nathansfile/Elastos.SDK.Wallet.C/obj");
+
+    DidProperty property1;
+    property1.mKey = "clark";
+    property1.mProperty = "hello,world";
+    property1.mStatus = "normal";
+    property1.mBlockTime = 1543902641;
+    property1.mTxid = "c39dd1463678146467ea1b43d8905e75ac34e727a4c36824410089a6682b43c8";
+    property1.mHeight = 66480;
+
+    DidProperty property2;
+    property2.mKey = "phone";
+    property2.mProperty = "13678929000";
+    property2.mStatus = "normal";
+    property2.mBlockTime = 1543902641;
+    property2.mTxid = "c39dd1463678146467ea1b43d8905e75ac34e727a4c36824410089a6682b43c8";
+    property2.mHeight = 66480;
+
+    std::vector<DidProperty> properties;
+    properties.push_back(property1);
+    properties.push_back(property2);
+
+    int ret = didDb.InsertProperty("iYnguKQcpeVyrpN6edamSkky1brvQvCWr6", properties);
+    if (ret != E_SQL_WRAPPER_OK) {
+        printf("insert failed %d\n", ret);
+        return;
+    }
+
+    DidProperty property;
+    ret = didDb.QueryProperty("iYnguKQcpeVyrpN6edamSkky1brvQvCWr6", "alice", &property);
+    if (ret == E_SQL_WRAPPER_OK) {
+        printf("property: %s, didstatus: %s\n", property.mProperty.c_str(), property.mDidStatus.c_str());
+    }
+    else if (ret == E_SQL_WRAPPER_NOT_FOUND) {
+        printf("query not found\n");
+    }
+    else {
+        printf("query failed %d\n", ret);
+    }
+
+    ret = didDb.DeleteProperty("iYnguKQcpeVyrpN6edamSkky1brvQvCWr6", "phone");
+    if (ret != E_SQL_WRAPPER_OK) {
+        printf("delete property failed ret %d\n", ret);
+    }
+
+}
+

@@ -5,10 +5,11 @@
 #include "common/Log.hpp"
 #include <sstream>
 #include <sqlite3.h>
+#include "CDbHelper.h"
 
 namespace elastos {
 
-CHistoryDb::CHistoryDb(std::string filePath, std::string tableName)
+CHistoryDb::CHistoryDb(const std::string& filePath, const std::string& tableName)
     : mDb(nullptr)
     , mTableName(tableName)
 {
@@ -21,7 +22,7 @@ CHistoryDb::CHistoryDb(std::string filePath, std::string tableName)
         return;
     }
 
-    if (TableExist(tableName)) return;
+    if (CDbHelper::TableExist(mDb, tableName)) return;
 
     char sql[512];
     sprintf(sql, "CREATE TABLE %s(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, txid TEXT NOT NULL, "
@@ -68,7 +69,7 @@ int CHistoryDb::Insert(const std::vector<History>& histories)
         Log::D("Database", "insert sql: %s\n", sql.c_str());
         ret = sqlite3_exec(mDb, sql.c_str(), NULL, NULL, &errMsg);
         if (ret != SQLITE_OK) {
-            Log::E("Database", "insert failed ret %d, %s\n", ret, errMsg);
+            Log::E("Database", "insert history failed ret %d, %s\n", ret, errMsg);
             sqlite3_free(errMsg);
             succeeded = false;
             break;
@@ -85,7 +86,7 @@ int CHistoryDb::Insert(const std::vector<History>& histories)
     }
 }
 
-int CHistoryDb::Delete(std::string txid, std::string address)
+int CHistoryDb::Delete(const std::string& txid, const std::string& address)
 {
     if (!mDb) {
         return E_SQL_WRAPPER_DB_OPEN;
@@ -114,7 +115,7 @@ int CHistoryDb::Delete(std::string txid, std::string address)
 
     int ret = sqlite3_exec(mDb, sql, NULL, NULL, &errMsg);
     if (ret != SQLITE_OK) {
-        Log::E("Database", "insert begin transaction failed ret %d, %s\n", ret, errMsg);
+        Log::E("Database", "delete history failed ret %d, %s\n", ret, errMsg);
         sqlite3_free(errMsg);
         return ret + E_SQL_WRAPPER_BASE;
     }
@@ -122,7 +123,7 @@ int CHistoryDb::Delete(std::string txid, std::string address)
     return E_SQL_WRAPPER_OK;
 }
 
-int CHistoryDb::Query(std::string address, std::vector<History*>* pHistories)
+int CHistoryDb::Query(const std::string& address, std::vector<History*>* pHistories)
 {
     if (!mDb) {
         return E_SQL_WRAPPER_DB_OPEN;
@@ -186,37 +187,10 @@ void CHistoryDb::CloseDb()
     mDb = nullptr;
 }
 
-bool CHistoryDb::TableExist(std::string tableName)
-{
-    char sql[128];
-    sprintf(sql, "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='%s'", tableName.c_str());
-    sqlite3_stmt* pStmt = nullptr;
-    bool exist = false;
-    int count;
-    int ret = sqlite3_prepare_v2(mDb, sql, -1, &pStmt, NULL);
-    if (ret != SQLITE_OK) {
-        goto exit;
-    }
-
-    ret = sqlite3_step(pStmt);
-    if (SQLITE_OK != ret && SQLITE_DONE != ret && SQLITE_ROW != ret) {
-        goto exit;
-    }
-
-    count = sqlite3_column_int(pStmt, 0);
-    exist = count > 0;
-
-exit:
-    if (pStmt) {
-        sqlite3_finalize(pStmt);
-    }
-    return exist;
-}
-
 std::string CHistoryDb::CreateInsertSql(const History& history)
 {
     std::stringstream stream;
-    stream << "INSERT OR IGNORE INTO " << mTableName;
+    stream << "INSERT OR REPLACE INTO " << mTableName;
     stream << "(id,txid,address,direction,amount,time,height,fee,inputs,outputs) VALUES (";
     stream << "(SELECT id FROM " << mTableName << " WHERE txid='" << history.mTxid << "' AND";
     stream << " address='" << history.mAddress << "'),'";
