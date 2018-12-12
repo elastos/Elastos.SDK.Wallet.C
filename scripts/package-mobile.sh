@@ -81,12 +81,15 @@ package_ios()
 		libtool -static -o "${pkg_ios_dir}/$abi/${PROJECT_NAME}.raw" *.a
 
 		package_list+=("$pkg_ios_dir/$abi/$PROJECT_NAME.raw")
+
+		mkdir -p "$pkg_ios_dir/include";
+		cp -rv "$BUILD_ROOT_DIR/iOS/$abi/include/$PROJECT_NAME/"* "$pkg_ios_dir/include/";
 	done
 
 	echo "Creating ${PROJECT_NAME}.framework"
 	cd "$pkg_ios_dir/";
 	mkdir -p "${PACKAGE_DIR}/${PROJECT_NAME}.framework/Headers";
-	#cp -r include/$PROJECT_NAME/* $PROJECT_NAME.framework/Headers/
+	cp -r "$pkg_ios_dir/include/"* "${PACKAGE_DIR}/${PROJECT_NAME}.framework/Headers";
 	lipo -create ${package_list[@]} -output "$PACKAGE_DIR/${PROJECT_NAME}.framework/${PROJECT_NAME}"
 
 	loginfo "Success to create ${PACKAGE_DIR}/${PROJECT_NAME}.framework";
