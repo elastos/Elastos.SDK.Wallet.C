@@ -5,13 +5,13 @@
 class Transaction
 {
 public:
-    Transaction(std::string address, int64 amount, std::string memo, int coinType);
+    Transaction(const std::string& address, int64 amount, const std::string& memo, int coinType);
 
-    void SetAddress(std::string address, int coinType);
+    void SetAddress(const std::string& address, int coinType);
 
     void SetAmount(int64 amount);
 
-    void SetMemo(std::string memo);
+    void SetMemo(const std::string& memo);
 
 };
 

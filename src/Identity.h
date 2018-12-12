@@ -6,18 +6,18 @@ class Identity
 {
 public:
 
-    Identity(std::string localPath);
+    Identity(const std::string& localPath);
 
-    HDWallet GetWallet(std::string seed, int coinType = CoinType_ELA);
+    HDWallet GetWallet(const std::string& seed, int coinType = CoinType_ELA);
 
-    SingleWallet GetWallet(std::string seed);
+    SingleWallet GetWallet(const std::string& seed);
 
-    MultiSignWallet GetWallet(std::string seed, std::vector<std::string> publicKeys,
-            std::string privateKey, int requiredCount, int coinType = CoinType_ELA);
+    MultiSignWallet GetWallet(const std::string& seed, const std::vector<std::string>& publicKeys,
+            const std::string& privateKey, int requiredCount, int coinType = CoinType_ELA);
 
-    Did GetDid(std::string seed, int index);
+    Did GetDid(const std::string& seed, int index);
 
-    Did CreateDid(std::string seed);
+    Did CreateDid(const std::string& seed);
 };
 
 #endif //__IDENTITY_H__

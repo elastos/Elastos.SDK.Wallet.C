@@ -7,12 +7,12 @@
 class Did
 {
 public:
-    Did(std::string seed, int index);
+    Did(const std::string& seed, int index);
 
     std::string GetId();
 
     // return signed info
-    std::string SetInfo(std::string json);
+    std::string SetInfo(const std::string& json);
 
     std::string GetInfo();
 

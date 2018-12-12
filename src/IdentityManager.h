@@ -5,15 +5,15 @@
 class IdentityManager
 {
 public:
-    Identity ImportFromFile(std::string filePath);
+    Identity ImportFromFile(const std::string& filePath);
 
-    void ExportToFile(Identity identity, std::string filePath);
+    void ExportToFile(const Identity& identity, const std::string& filePath);
 
-    std::string GetMnmonic(std::string lanaguage);
+    std::string GetMnmonic(const std::string& lanaguage);
 
-    std::string GetSeed(std::string mnmonic, std::string mnmonicPassword);
+    std::string GetSeed(const std::string& mnmonic, const std::string& mnmonicPassword);
 
-    Identity CreateIdentity(std::string seed, std::string localPath);
+    Identity CreateIdentity(const std::string& seed, const std::string& localPath);
 };
 
 #endif //__IDENTITY_MANAGER_H__

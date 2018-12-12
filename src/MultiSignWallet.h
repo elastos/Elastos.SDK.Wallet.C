@@ -5,8 +5,8 @@
 class MultiSignWallet
 {
 public:
-    MultiSignWallet(std::vector<std::string> publicKeys,
-            std::string privateKey, int requireCount, BlockChainNode node, int coinType = CoinType_ELA);
+    MultiSignWallet(const std::vector<std::string>& publicKeys,
+            const std::string& privateKey, int requireCount, const BlockChainNode& node, int coinType = CoinType_ELA);
 
     int GetCoinType();
 
@@ -17,13 +17,13 @@ public:
     std::string GetBalance();
 
     // create a new transaction
-    std::string SignTransaction(std::vector<Transaction> transactions, std::string seed);
+    std::string SignTransaction(const std::vector<Transaction>& transactions, const std::string& seed);
 
     // sign the transaction from cosigner
-    std::string SignTransaction(std::string json, std::string seed);
+    std::string SignTransaction(const std::string& json, const std::string& seed);
 
     // send the signed transaction
-    int SendTransaction(std::string json);
+    int SendTransaction(const std::string& json);
 
 };
 

@@ -5,17 +5,17 @@
 class HDWallet
 {
 public:
-    HDWallet(std::string seed, BlockChainNode node, int coinType = CoinType_ELA);
+    HDWallet(const std::string& seed, const BlockChainNode& node, int coinType = CoinType_ELA);
 
     int GetCoinType();
 
-    int SendTransaction(std::vector<Transaction> transactions, std::string payPassword);
+    int SendTransaction(const std::vector<Transaction>& transactions, const std::string& payPassword);
 
     std::string GetAddress(int chain, int index);
 
     std::string GetPublicKey(int chain, int index);
 
-    std::string GetBalance(std::string address);
+    std::string GetBalance(const std::string& address);
 
 };
 

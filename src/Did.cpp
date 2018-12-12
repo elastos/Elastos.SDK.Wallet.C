@@ -1,5 +1,5 @@
 #include "Did.h"
 
-Did::Did(std::string seed, int index)
+Did::Did(const std::string& seed, int index)
 {
 }

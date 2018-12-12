@@ -5,13 +5,13 @@
 class SingleWallet
 {
 public:
-    SingleWallet(std::string seed, BlockChainNode node);
+    SingleWallet(const std::string& seed, const BlockChainNode& node);
 
     std::string GetPublicKey();
 
     std::string GetAddress();
 
-    int SendTransaction(std::vector<Transaction> transactions, std::string seed);
+    int SendTransaction(const std::vector<Transaction>& transactions, const std::string& seed);
 
 };
 

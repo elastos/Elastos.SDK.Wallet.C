@@ -5,13 +5,13 @@
 class BlockChainNode
 {
 public:
-    BlockChainNode(std::string url);
+    BlockChainNode(const std::string& url);
 
-    void SetUrl(std::string url);
+    void SetUrl(const std::string& url);
 
     std::string GetUrl();
 
-    void SetCertificate(std::string cert);
+    void SetCertificate(const std::string& cert);
 };
 
 #endif //__BLOCK_CHAIN_NODE_H__
