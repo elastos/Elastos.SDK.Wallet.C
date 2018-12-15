@@ -1,0 +1,15 @@
+# Package Information for pkg-config
+
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}/bin
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: Elastos.SDK.Wallet.C
+Description: Elastos.SDK.Wallet.C
+Version: @PACKAGE_VERSION@
+
+Requires:
+Libs: -L${libdir} -lElastos.SDK.Wallet.C
+Libs.private: ${libdir}
+Cflags: -I${includedir}/Elastos.SDK.Wallet.C
