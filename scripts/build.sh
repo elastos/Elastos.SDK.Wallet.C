@@ -21,6 +21,6 @@ build_extfunc_depends()
 	"$DEPENDS_DIR/build-Elastos.ORG.Wallet.Lib.C.sh" $@;
 	
 }
-CFG_PROJECT_DIR="$PROJECT_DIR";
+export CFG_PROJECT_DIR="$PROJECT_DIR";
 source "$DEPENDS_DIR/build.sh" $@;
 
