@@ -2,18 +2,29 @@
 #ifndef __IDENTITY_MANAGER_H__
 #define __IDENTITY_MANAGER_H__
 
+#include <string>
+#include <vector>
+#include "Identity.h"
+
+namespace elastos {
+
 class IdentityManager
 {
 public:
-    Identity ImportFromFile(const std::string& filePath);
+    static int ImportFromFile(const std::string& filePath, std::shared_ptr<Identity>* identity);
 
-    void ExportToFile(const Identity& identity, const std::string& filePath);
+    static void ExportToFile(const std::shared_ptr<Identity>& identity, const std::string& filePath);
 
-    std::string GetMnmonic(const std::string& lanaguage);
+    static std::string GetMnemonic(const std::string& lanaguage, const std::string& words);
 
-    std::string GetSeed(const std::string& mnmonic, const std::string& mnmonicPassword);
+    static std::string GetSeed(const std::string& mnemonic, const std::string& lanaguage, const std::string& words, const std::string& mnmonicPassword);
 
-    Identity CreateIdentity(const std::string& seed, const std::string& localPath);
+    static int CreateIdentity(const std::string& localPath, std::shared_ptr<Identity>* identity);
+
+public:
+    static std::vector<std::shared_ptr<Identity>> sIdentities;
 };
+
+}
 
 #endif //__IDENTITY_MANAGER_H__

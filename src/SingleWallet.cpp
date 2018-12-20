@@ -12,8 +12,9 @@ namespace elastos {
 
 #define CLASS_TEXT  "SingleWallet"
 
-SingleWallet::SingleWallet(const std::string& seed, std::shared_ptr<BlockChainNode> node)
-    : mBlockChainNode(node)
+SingleWallet::SingleWallet(const std::string& seed, std::unique_ptr<BlockChainNode> node)
+    : mBlockChainNode(std::move(node))
+    , mIndex(0)
 {
     uint8_t* seedBuf;
     int seedLen = Utils::Str2Hex(seed, &seedBuf);
@@ -145,7 +146,12 @@ long SingleWallet::GetBalance()
     double balance = std::stod(result);
 
     return balance * 100000000;
-};
+}
+
+int SingleWallet::GetIndex()
+{
+    return mIndex;
+}
 
 int SingleWallet::CreateTransaction(const std::vector<Transaction>& transactions, std::string& txJson)
 {
@@ -211,6 +217,11 @@ int SingleWallet::HttpPost(const std::string& api, const std::string& body, std:
     Log::D(CLASS_TEXT, "response: %s\n", result.c_str());
     if (ret > 0) return 0;
     else return ret;
+}
+
+void SingleWallet::SetIndex(int index)
+{
+    mIndex = index;
 }
 
 } // namespace elastos

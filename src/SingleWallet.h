@@ -5,13 +5,14 @@
 #include <string>
 #include "BlockChainNode.h"
 #include "Transaction.h"
+#include "Wallet.h"
 
 namespace elastos {
 
-class SingleWallet
+class SingleWallet : public Wallet
 {
 public:
-    SingleWallet(const std::string& seed, std::shared_ptr<BlockChainNode> node);
+    SingleWallet(const std::string& seed, std::unique_ptr<BlockChainNode> node);
 
     std::string GetPublicKey();
 
@@ -21,6 +22,8 @@ public:
 
     long GetBalance();
 
+    int GetIndex();
+
 private:
     int CreateTransaction(const std::vector<Transaction>& transactions, std::string& txJson);
 
@@ -28,10 +31,15 @@ private:
 
     int HttpPost(const std::string& api, const std::string& body, std::string& result);
 
+    void SetIndex(int index);
+
 private:
-    std::shared_ptr<BlockChainNode> mBlockChainNode;
+    std::unique_ptr<BlockChainNode> mBlockChainNode;
     std::string mPublicKey;
     std::string mAddress;
+    int mIndex;
+
+    friend class Identity;
 };
 
 } // namespace elastos
