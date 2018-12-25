@@ -8,6 +8,7 @@
 #include <vector>
 #include "Identity.h"
 #include "IdentityManager.h"
+#include "Did.h"
 
 using namespace elastos;
 
@@ -64,21 +65,32 @@ void TestSingleWallet()
     index = identity->CreateWallet(seed, &wallet);
     printf("wallet index:%d\n", index);
 
-    long balance = wallet->GetBalance();
-    printf("balance: %ld\n", balance);
+    std::string publicKey = wallet->GetPublicKey();
 
-    Transaction tx("EdyqqiJcdkTDtfkvxVbTuNXGMdB3FEcpXA", 100000000L, "");
-    std::vector<Transaction> transactions;
-    transactions.push_back(tx);
-    std::string txid;
-    int ret = wallet->SendTransaction(transactions, seed, txid);
-    if (ret != E_WALLET_C_OK) {
-        printf("send transaction failed: %d\n", ret);
-        return;
-    }
+    // long balance = wallet->GetBalance();
+    // printf("balance: %ld\n", balance);
 
-    printf("txid: %s\n", txid.c_str());
+    // Transaction tx("EdyqqiJcdkTDtfkvxVbTuNXGMdB3FEcpXA", 100000000L, "");
+    // std::vector<Transaction> transactions;
+    // transactions.push_back(tx);
+    // std::string txid;
+    // int ret = wallet->SendTransaction(transactions, seed, txid);
+    // if (ret != E_WALLET_C_OK) {
+    //     printf("send transaction failed: %d\n", ret);
+    //     return;
+    // }
 
-    balance = wallet->GetBalance();
-    printf("balance: %ld\n", balance);
+    // printf("txid: %s\n", txid.c_str());
+
+    // balance = wallet->GetBalance();
+    // printf("balance: %ld\n", balance);
+
+    Did didObj(publicKey);
+    std::string did = didObj.GetId();
+    printf("did: %s\n", did.c_str());
+
+    std::string str("{\"key\": \"name\", \"value\":\"alice\"}");
+    std::string info = didObj.SetInfo(seed, 0, str);
+    printf("signed info: %s\n", info.c_str());
+
 }

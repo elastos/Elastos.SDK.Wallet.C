@@ -21,6 +21,8 @@ public:
 
     static int CreateIdentity(const std::string& localPath, std::shared_ptr<Identity>* identity);
 
+    static int DestroyIdentity(int index);
+
 public:
     static std::vector<std::shared_ptr<Identity>> sIdentities;
 };

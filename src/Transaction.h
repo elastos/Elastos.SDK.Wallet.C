@@ -28,9 +28,9 @@ public:
 
 private:
     std::string mAddress;
-    long mAmount;
+    long mAmount = 0;
     std::string mMemo;
-    int mCoinType;
+    int mCoinType = 0;
 };
 
 } //namespace elastos

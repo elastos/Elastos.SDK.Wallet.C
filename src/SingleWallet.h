@@ -37,7 +37,7 @@ private:
     std::unique_ptr<BlockChainNode> mBlockChainNode;
     std::string mPublicKey;
     std::string mAddress;
-    int mIndex;
+    int mIndex = 0;
 
     friend class Identity;
 };

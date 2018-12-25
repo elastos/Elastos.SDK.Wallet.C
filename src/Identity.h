@@ -35,7 +35,7 @@ private:
 private:
     std::vector<std::shared_ptr<Wallet>> mWallets;
     std::string mLocalPath;
-    int mIndex;
+    int mIndex = 0;
 
     friend class IdentityManager;
 };

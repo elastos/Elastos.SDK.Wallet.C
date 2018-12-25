@@ -7,7 +7,6 @@ namespace elastos {
 
 Identity::Identity(const std::string& localPath)
     : mLocalPath(localPath)
-    , mIndex(0)
 {}
 
 // int Identity::GetWallet(const std::string& seed, int coinType, std::shared_ptr<HDWallet>* wallet)

@@ -14,7 +14,6 @@ namespace elastos {
 
 SingleWallet::SingleWallet(const std::string& seed, std::unique_ptr<BlockChainNode> node)
     : mBlockChainNode(std::move(node))
-    , mIndex(0)
 {
     uint8_t* seedBuf;
     int seedLen = Utils::Str2Hex(seed, &seedBuf);
