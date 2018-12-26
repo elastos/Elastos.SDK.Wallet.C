@@ -1,5 +1,4 @@
 
-#include "SingleWallet.h"
 #include "Transaction.h"
 #include "BlockChainNode.h"
 #include "WalletError.h"
@@ -61,20 +60,23 @@ void TestSingleWallet()
     int index = IdentityManager::CreateIdentity("/Users/nathansfile/Elastos.SDK.Wallet.C", &identity);
     printf("identity index:%d\n", index);
 
-    std::shared_ptr<SingleWallet> wallet;
-    index = identity->CreateWallet(seed, &wallet);
-    printf("wallet index:%d\n", index);
 
-    std::string publicKey = wallet->GetPublicKey();
+    std::shared_ptr<HDWallet> hdWallet;
+    index = identity->CreateSingleAddressWallet(seed, &hdWallet);
+    printf("hd wallet index:%d\n", index);
 
-    // long balance = wallet->GetBalance();
-    // printf("balance: %ld\n", balance);
+    std::string publicKey = hdWallet->GetPublicKey(0, 0);
+    std::string hdSingleAddress = hdWallet->GetAddress(0, 0);
+    printf("hd address:%s\n", hdSingleAddress.c_str());
+
+    long balance = hdWallet->GetBalance(hdSingleAddress);
+    printf("balance: %ld\n", balance);
 
     // Transaction tx("EdyqqiJcdkTDtfkvxVbTuNXGMdB3FEcpXA", 100000000L, "");
     // std::vector<Transaction> transactions;
     // transactions.push_back(tx);
     // std::string txid;
-    // int ret = wallet->SendTransaction(transactions, seed, txid);
+    // int ret = hdWallet->SendTransaction(transactions, seed, txid);
     // if (ret != E_WALLET_C_OK) {
     //     printf("send transaction failed: %d\n", ret);
     //     return;

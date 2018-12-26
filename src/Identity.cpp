@@ -9,12 +9,7 @@ Identity::Identity(const std::string& localPath)
     : mLocalPath(localPath)
 {}
 
-// int Identity::GetWallet(const std::string& seed, int coinType, std::shared_ptr<HDWallet>* wallet)
-// {
-//     return E_WALLET_C_OK;
-// }
-
-int Identity::CreateWallet(const std::string& seed, std::shared_ptr<SingleWallet>* wallet)
+int Identity::CreateSingleAddressWallet(const std::string& seed, std::shared_ptr<HDWallet>* wallet)
 {
     if (seed.empty() || !wallet) {
         return E_WALLET_C_INVALID_ARGUMENT;
@@ -23,11 +18,29 @@ int Identity::CreateWallet(const std::string& seed, std::shared_ptr<SingleWallet
     std::string url(TEST_NET ? TEST_NET_WALLET_SERVICE_URL : WALLET_SERVICE_URL);
 
     std::unique_ptr<BlockChainNode> node = std::make_unique<BlockChainNode>(url);
-    std::shared_ptr<SingleWallet> singleWallet = std::make_shared<SingleWallet>(seed, std::move(node));
-    mWallets.push_back(singleWallet);
+    std::shared_ptr<HDWallet> hdWallet = std::make_shared<HDWallet>(seed, node, true);
+    mWallets.push_back(hdWallet);
     int index = mWallets.size() - 1;
 
-    *wallet = singleWallet;
+    *wallet = hdWallet;
+
+    return index;
+}
+
+int Identity::CreateWallet(const std::string& seed, int coinType, std::shared_ptr<HDWallet>* wallet)
+{
+    if (seed.empty() || !wallet) {
+        return E_WALLET_C_INVALID_ARGUMENT;
+    }
+
+    std::string url(TEST_NET ? TEST_NET_WALLET_SERVICE_URL : WALLET_SERVICE_URL);
+
+    std::unique_ptr<BlockChainNode> node = std::make_unique<BlockChainNode>(url);
+    std::shared_ptr<HDWallet> hdWallet = std::make_shared<HDWallet>(seed, node, coinType);
+    mWallets.push_back(hdWallet);
+    int index = mWallets.size() - 1;
+
+    *wallet = hdWallet;
 
     return index;
 }
@@ -51,11 +64,28 @@ int Identity::CreateWallet(const std::string& seed, std::shared_ptr<SingleWallet
 
 std::shared_ptr<Wallet> Identity::GetByIndex(int index)
 {
-    return nullptr;
+    if (index < 0 || index >= mWallets.size()) {
+        return nullptr;
+    }
+    return mWallets.at(index);
+}
+
+int Identity::DestroyWallet(int index)
+{
+    if (index < 0 || index >= mWallets.size()) {
+        return E_WALLET_C_OUT_OF_RANGE;
+    }
+
+    std::shared_ptr<Wallet> wallet = mWallets.at(index);
+    wallet.reset();
+    mWallets[index] = nullptr;
+
+    return E_WALLET_C_OK;
 }
 
 void Identity::SetIndex(int index)
 {
+    assert(index >= 0);
     mIndex = index;
 }
 

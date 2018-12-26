@@ -4,8 +4,8 @@
 
 #include <string>
 #include <vector>
-#include "SingleWallet.h"
 #include "Wallet.h"
+#include "HDWallet.h"
 
 namespace elastos {
 
@@ -15,9 +15,9 @@ public:
 
     Identity(const std::string& localPath);
 
-    // int GetWallet(const std::string& seed, int coinType, std::shared_ptr<HDWallet>* wallet);
+    int CreateSingleAddressWallet(const std::string& seed, std::shared_ptr<HDWallet>* wallet);
 
-    int CreateWallet(const std::string& seed, std::shared_ptr<SingleWallet>* wallet);
+    int CreateWallet(const std::string& seed, int coinType, std::shared_ptr<HDWallet>* wallet);
 
     // int GetWallet(const std::string& seed, const std::vector<std::string>& publicKeys,
     //         const std::string& privateKey, int requiredCount, int coinType,
@@ -28,6 +28,8 @@ public:
     // int CreateDid(const std::string& seed, std::shared_ptr<Did>* did);
 
     std::shared_ptr<Wallet> GetByIndex(int index);
+
+    int DestroyWallet(int index);
 
 private:
     void SetIndex(int index);

@@ -23,6 +23,8 @@ public:
 
     static int DestroyIdentity(int index);
 
+    static std::shared_ptr<Identity> GetByIndex(int index);
+
 public:
     static std::vector<std::shared_ptr<Identity>> sIdentities;
 };

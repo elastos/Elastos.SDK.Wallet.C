@@ -62,4 +62,25 @@ int IdentityManager::CreateIdentity(const std::string& localPath, std::shared_pt
     return index;
 }
 
+int IdentityManager::DestroyIdentity(int index)
+{
+    if (index < 0 || index >= sIdentities.size()) {
+        return E_WALLET_C_OUT_OF_RANGE;
+    }
+
+    std::shared_ptr<Identity> identity = sIdentities.at(index);
+    identity.reset();
+    sIdentities[index] = nullptr;
+
+    return E_WALLET_C_OK;
+}
+
+std::shared_ptr<Identity> IdentityManager::GetByIndex(int index)
+{
+    if (index < 0 || index >= sIdentities.size()) {
+        return nullptr;
+    }
+    return sIdentities.at(index);
+}
+
 }
