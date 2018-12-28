@@ -91,8 +91,8 @@ void TestSingleWallet()
     std::string did = didObj.GetId();
     printf("did: %s\n", did.c_str());
 
-    std::string str("{\"key\": \"name\", \"value\":\"alice\"}");
-    std::string info = didObj.SetInfo(seed, 0, str);
+    std::string str("[{\"Key\": \"name\", \"Value\":\"alice\"}]");
+    std::string info = didObj.SignInfo(seed, 0, str);
     printf("signed info: %s\n", info.c_str());
 
 }

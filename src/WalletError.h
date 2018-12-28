@@ -8,5 +8,6 @@
 #define E_WALLET_C_NODE_ERROR               -3
 #define E_WALLET_C_NOT_IMPLEMENTED          -4
 #define E_WALLET_C_OUT_OF_RANGE             -5
+#define E_WALLET_C_OUT_OF_MEMORY            -6
 
 #endif //__WALLET_C_ERROR_H__
