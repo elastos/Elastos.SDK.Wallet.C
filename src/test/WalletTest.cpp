@@ -87,12 +87,15 @@ void TestSingleWallet()
     // balance = wallet->GetBalance();
     // printf("balance: %ld\n", balance);
 
-    Did didObj(publicKey);
-    std::string did = didObj.GetId();
+    std::shared_ptr<Did> didObj;
+    index = identity->CreateDid(publicKey, &didObj);
+    std::string did = didObj->GetId();
     printf("did: %s\n", did.c_str());
 
     std::string str("[{\"Key\": \"name\", \"Value\":\"alice\"}]");
-    std::string info = didObj.SignInfo(seed, 0, str);
+    std::string info = didObj->SignInfo(seed, 0, str);
     printf("signed info: %s\n", info.c_str());
+
+    didObj->SyncInfo();
 
 }

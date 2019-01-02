@@ -5,11 +5,14 @@
 #include "nlohmann/json.hpp"
 #include <vector>
 #include "WalletError.h"
+#include "wrapper/httpclient/HttpClient.hpp"
+#include "wrapper/database/CDidDb.h"
 
 namespace elastos {
 
-Did::Did(const std::string& publicKey)
+Did::Did(const std::string& publicKey, const std::string& path)
     : mPublicKey(publicKey)
+    , mPath(path)
 {
     assert(!publicKey.empty());
     char* did = getDid(publicKey.c_str());
@@ -39,9 +42,9 @@ std::string Did::SignInfo(const std::string& seed, int index, const std::string&
     }
 
     nlohmann::json memo;
-    memo["msg"] = Utils::Hex2Str(buf, len);
+    memo["msg"] = Utils::Hex2Str(buf, len).c_str();
     memo["pub"] = mPublicKey;
-    memo["sig"] = signedInfo;
+    memo["sig"] = signedInfo.c_str();
     free(buf);
 
     return memo.dump();
@@ -68,9 +71,81 @@ std::string Did::SetInfo(const std::string& seed, int index, const std::string& 
     return txid;
 }
 
-std::string Did::GetInfo()
+int Did::SyncInfo()
+{
+    HttpClient httpClient;
+    HttpClient::InitGlobal();
+
+    std::string url = TEST_NET ? TEST_NET_DID_SERVICE_URL : DID_SERVICE_URL;
+    url.append("/api/1/didexplorer/did/");
+    url.append(mDid);
+    url.append("?detailed=true");
+
+    Log::D("Did", "url: %s\n", url.c_str());
+
+    httpClient.Url(url);
+    httpClient.SetTimeout(5000);
+    httpClient.SetHeader("Content-Type", "application/json");
+    int ret = httpClient.SyncGet();
+    if (ret != E_WALLET_C_OK) {
+        Log::E("Did", "http get did properties failed ret:%d\n", ret);
+        return ret;
+    }
+
+    ret = httpClient.GetResponseStatus();
+    if (ret != 200) {
+        Log::E("Did", "http get properties status: %d\n", ret);
+        return ret;
+    }
+
+    std::string bodyStr;
+    ret = httpClient.GetResponseBody(bodyStr);
+    if (ret < 0) {
+        Log::E("Did", "http get properties response: %d\n", ret);
+        return ret;
+    }
+
+    Log::D("Did", "response: %s\n", bodyStr.c_str());
+    nlohmann::json jRsp = nlohmann::json::parse(bodyStr);
+    int status = jRsp["status"];
+    if (status != 200) {
+        std::string result = jRsp["result"];
+        Log::E("Did", "get properties failed: %s\n", result.c_str());
+        return Utils::ServiceErr2SdkErr(status);
+    }
+
+    std::string result = jRsp["result"];
+    if (result.empty()) {
+        Log::D("Did", "did is deprecated or no property set\n");
+        return E_WALLET_C_OK;
+    }
+
+    std::vector<nlohmann::json> jProperties = nlohmann::json::parse(result);
+    std::vector<DidProperty> properties;
+    for (nlohmann::json property : jProperties) {
+        DidProperty dp;
+        dp.mKey = property["key"];
+        dp.mProperty = property["value"];
+        dp.mDid = mDid;
+        dp.mBlockTime = property["blockTime"];
+        dp.mHeight = property["height"];
+        dp.mTxid = property["txid"];
+        properties.push_back(dp);
+    }
+    CDidDb db(mPath);
+    db.InsertProperty(mDid, properties);
+
+    return E_WALLET_C_OK;
+}
+
+std::string Did::GetInfo(const std::string& key)
 {
     return "";
+}
+
+int Did::GetIndex()
+{
+    return mIndex;
 }
 
 std::string Did::SignInfo(const std::string& seed, int index, const uint8_t* message, int len)
@@ -130,6 +205,11 @@ int Did::GenDidUploadInfo(const std::string& json, uint8_t** buf)
 
     *buf = binary;
     return len;
+}
+
+void Did::SetIndex(int index)
+{
+    mIndex = index;
 }
 
 }

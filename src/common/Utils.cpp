@@ -1,4 +1,5 @@
 #include "Utils.h"
+#include "WalletError.h"
 
 namespace elastos {
 
@@ -44,6 +45,22 @@ int Utils::Str2Hex(const std::string& str, uint8_t** buf)
     }
 
     return len;
+}
+
+int Utils::ServiceErr2SdkErr(int error)
+{
+    switch(error) {
+    case 400:
+        return E_WALLET_C_BAD_REQUEST;
+    case 404:
+        return E_WALLET_C_NOT_FOUND;
+    case 500:
+        return E_WALLET_C_INTERNAL_ERROR;
+    case 10001:
+        return E_WALLET_C_PROCESS_ERROR;
+    default:
+        return E_WALLET_C_SERVICE_ERROR;
+    }
 }
 
 } // namespace elastos

@@ -10,4 +10,12 @@
 #define E_WALLET_C_OUT_OF_RANGE             -5
 #define E_WALLET_C_OUT_OF_MEMORY            -6
 
+
+// error from service
+#define E_WALLET_C_SERVICE_ERROR            -200
+#define E_WALLET_C_BAD_REQUEST              -201
+#define E_WALLET_C_NOT_FOUND                -202
+#define E_WALLET_C_INTERNAL_ERROR           -203
+#define E_WALLET_C_PROCESS_ERROR            -204
+
 #endif //__WALLET_C_ERROR_H__

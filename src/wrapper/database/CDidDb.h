@@ -14,13 +14,13 @@ struct DidProperty
 {
     int mId;
     std::string mDid;
-    std::string mDidStatus;
+    std::string mDidStatus = "normal";
     std::string mKey;
     std::string mProperty;
-    std::string mStatus;
-    long mBlockTime;
-    std::string mTxid;
-    long mHeight;
+    std::string mStatus = "normal";
+    long mBlockTime = 0l;
+    std::string mTxid = "";
+    long mHeight = 0l;
 };
 
 class CDidDb

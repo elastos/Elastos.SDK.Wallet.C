@@ -10,7 +10,7 @@ namespace elastos {
 class Did
 {
 public:
-    Did(const std::string& publicKey);
+    Did(const std::string& publicKey, const std::string& path);
 
     std::string GetId();
 
@@ -20,16 +20,27 @@ public:
     // return txid
     std::string SetInfo(const std::string& seed, int index, const std::string& json, const std::shared_ptr<HDWallet>& wallet);
 
-    std::string GetInfo();
+    // sync the did info
+    int SyncInfo();
+
+    std::string GetInfo(const std::string& key);
+
+    int GetIndex();
 
 private:
     int GenDidUploadInfo(const std::string& json, uint8_t** buf);
 
     std::string SignInfo(const std::string& seed, int index, const uint8_t* message, int len);
 
+    void SetIndex(int index);
+
 private:
     std::string mPublicKey;
     std::string mDid;
+    std::string mPath;
+    int mIndex;
+
+    friend class Identity;
 };
 
 }

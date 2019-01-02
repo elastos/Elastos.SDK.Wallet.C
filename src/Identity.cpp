@@ -83,6 +83,41 @@ int Identity::DestroyWallet(int index)
     return E_WALLET_C_OK;
 }
 
+int Identity::CreateDid(const std::string& publicKey, std::shared_ptr<Did>* did)
+{
+    if (publicKey.empty() || !did) {
+        return E_WALLET_C_INVALID_ARGUMENT;
+    }
+
+    std::shared_ptr<Did> temp = std::make_shared<Did>(publicKey, mLocalPath);
+    mDids.push_back(temp);
+    int index = mDids.size() - 1;
+    *did = temp;
+
+    return index;
+}
+
+std::shared_ptr<Did> Identity::GetDidByIndex(int index)
+{
+    if (index < 0 || index >= mDids.size()) {
+        return nullptr;
+    }
+    return mDids.at(index);
+}
+
+int Identity::DestroyDid(int index)
+{
+    if (index < 0 || index >= mDids.size()) {
+        return E_WALLET_C_OUT_OF_RANGE;
+    }
+
+    std::shared_ptr<Did> did = mDids.at(index);
+    did.reset();
+    mDids[index] = nullptr;
+
+    return E_WALLET_C_OK;
+}
+
 void Identity::SetIndex(int index)
 {
     assert(index >= 0);
