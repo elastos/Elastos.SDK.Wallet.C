@@ -7,6 +7,7 @@
 #include "WalletError.h"
 #include "wrapper/httpclient/HttpClient.hpp"
 #include "wrapper/database/CDidDb.h"
+#include "wrapper/database/SqliteWrapperError.h"
 
 namespace elastos {
 
@@ -141,7 +142,21 @@ int Did::SyncInfo()
 
 std::string Did::GetInfo(const std::string& key)
 {
-    return "";
+    CDidDb db(mPath);
+    DidProperty property;
+    int ret = db.QueryProperty(mDid, key, &property);
+    if (ret != E_SQL_WRAPPER_OK) {
+        Log::E("Did", "query property failed %d\n", ret);
+        return "";
+    }
+
+    nlohmann::json jpro;
+    jpro["did"] = mDid;
+    jpro["key"] = key;
+    jpro["value"] = property.mProperty;
+    jpro["blockTime"] = property.mBlockTime;
+    jpro["txid"] = property.mTxid;
+    return jpro.dump();
 }
 
 int Did::GetPosition()
