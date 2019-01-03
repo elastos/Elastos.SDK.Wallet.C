@@ -7,7 +7,7 @@ namespace elastos {
 class Wallet
 {
 public:
-    virtual int GetIndex() = 0;
+    virtual int GetPosition() = 0;
 };
 
 } // namespace elastos

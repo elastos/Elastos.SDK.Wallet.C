@@ -56,31 +56,31 @@ int IdentityManager::CreateIdentity(const std::string& localPath, std::shared_pt
     *identity = identityPtr;
 
     sIdentities.push_back(identityPtr);
-    int index = sIdentities.size() - 1;
-    identityPtr->SetIndex(index);
+    int pos = sIdentities.size() - 1;
+    identityPtr->SetPosition(pos);
 
-    return index;
+    return pos;
 }
 
-int IdentityManager::DestroyIdentity(int index)
+int IdentityManager::DestroyIdentity(int pos)
 {
-    if (index < 0 || index >= sIdentities.size()) {
+    if (pos < 0 || pos >= sIdentities.size()) {
         return E_WALLET_C_OUT_OF_RANGE;
     }
 
-    std::shared_ptr<Identity> identity = sIdentities.at(index);
+    std::shared_ptr<Identity> identity = sIdentities.at(pos);
     identity.reset();
-    sIdentities[index] = nullptr;
+    sIdentities[pos] = nullptr;
 
     return E_WALLET_C_OK;
 }
 
-std::shared_ptr<Identity> IdentityManager::GetByIndex(int index)
+std::shared_ptr<Identity> IdentityManager::GetByPosition(int pos)
 {
-    if (index < 0 || index >= sIdentities.size()) {
+    if (pos < 0 || pos >= sIdentities.size()) {
         return nullptr;
     }
-    return sIdentities.at(index);
+    return sIdentities.at(pos);
 }
 
 }

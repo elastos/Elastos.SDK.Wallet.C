@@ -161,9 +161,9 @@ int HDWallet::GetBalance(const std::string& address)
     return balance * 100000000;
 }
 
-int HDWallet::GetIndex()
+int HDWallet::GetPosition()
 {
-    return mIndex;
+    return mPosition;
 }
 
 int HDWallet::SingleAddressCreateTx(const std::vector<Transaction>& transactions, const std::string& seed, std::string& txJson)
@@ -285,10 +285,10 @@ int HDWallet::HttpPost(const std::string& api, const std::string& body, std::str
     else return ret;
 }
 
-void HDWallet::SetIndex(int index)
+void HDWallet::SetPosition(int pos)
 {
-    assert(index >= 0);
-    mIndex = index;
+    assert(pos >= 0);
+    mPosition = pos;
 }
 
 } // namespace elastos

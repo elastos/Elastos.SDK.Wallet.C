@@ -7,6 +7,7 @@
 #include "Wallet.h"
 #include "HDWallet.h"
 #include "Did.h"
+#include "DidManager.h"
 
 namespace elastos {
 
@@ -24,24 +25,24 @@ public:
     //         const std::string& privateKey, int requiredCount, int coinType,
     //         std::shared_ptr<MultiSignWallet>* wallet);
 
-    std::shared_ptr<Wallet> GetByIndex(int index);
+    std::shared_ptr<Wallet> GetByPosition(int pos);
 
-    int DestroyWallet(int index);
+    int DestroyWallet(int pos);
 
-    int CreateDid(const std::string& publicKey, std::shared_ptr<Did>* did);
+    int CreateDidManager(const std::string& seed, std::shared_ptr<DidManager>* manager);
 
-    std::shared_ptr<Did> GetDidByIndex(int index);
+    std::shared_ptr<DidManager> GetDidManager();
 
-    int DestroyDid(int index);
+    int DestroyDidManager();
 
 private:
-    void SetIndex(int index);
+    void SetPosition(int pos);
 
 private:
     std::vector<std::shared_ptr<Wallet>> mWallets;
-    std::vector<std::shared_ptr<Did>> mDids;
+    std::shared_ptr<DidManager> mDidManager;
     std::string mLocalPath;
-    int mIndex = 0;
+    int mPosition = 0;
 
     friend class IdentityManager;
 };

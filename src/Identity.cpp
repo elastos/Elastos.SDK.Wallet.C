@@ -38,11 +38,12 @@ int Identity::CreateWallet(const std::string& seed, int coinType, std::shared_pt
     std::unique_ptr<BlockChainNode> node = std::make_unique<BlockChainNode>(url);
     std::shared_ptr<HDWallet> hdWallet = std::make_shared<HDWallet>(seed, node, coinType);
     mWallets.push_back(hdWallet);
-    int index = mWallets.size() - 1;
+    int pos = mWallets.size() - 1;
+    hdWallet->SetPosition(pos);
 
     *wallet = hdWallet;
 
-    return index;
+    return pos;
 }
 
 // int Identity::GetWallet(const std::string& seed, const std::vector<std::string>& publicKeys,
@@ -62,66 +63,64 @@ int Identity::CreateWallet(const std::string& seed, int coinType, std::shared_pt
 //     return E_WALLET_C_OK;
 // }
 
-std::shared_ptr<Wallet> Identity::GetByIndex(int index)
+std::shared_ptr<Wallet> Identity::GetByPosition(int pos)
 {
-    if (index < 0 || index >= mWallets.size()) {
+    if (pos < 0 || pos >= mWallets.size()) {
         return nullptr;
     }
-    return mWallets.at(index);
+    return mWallets.at(pos);
 }
 
-int Identity::DestroyWallet(int index)
+int Identity::DestroyWallet(int pos)
 {
-    if (index < 0 || index >= mWallets.size()) {
+    if (pos < 0 || pos >= mWallets.size()) {
         return E_WALLET_C_OUT_OF_RANGE;
     }
 
-    std::shared_ptr<Wallet> wallet = mWallets.at(index);
+    std::shared_ptr<Wallet> wallet = mWallets.at(pos);
+    if (wallet == nullptr) {
+        return E_WALLET_C_OK;
+    }
+
     wallet.reset();
-    mWallets[index] = nullptr;
+    mWallets[pos] = nullptr;
 
     return E_WALLET_C_OK;
 }
 
-int Identity::CreateDid(const std::string& publicKey, std::shared_ptr<Did>* did)
+int Identity::CreateDidManager(const std::string& seed, std::shared_ptr<DidManager>* manager)
 {
-    if (publicKey.empty() || !did) {
+    if (seed.empty() || !manager) {
         return E_WALLET_C_INVALID_ARGUMENT;
     }
 
-    std::shared_ptr<Did> temp = std::make_shared<Did>(publicKey, mLocalPath);
-    mDids.push_back(temp);
-    int index = mDids.size() - 1;
-    *did = temp;
-
-    return index;
-}
-
-std::shared_ptr<Did> Identity::GetDidByIndex(int index)
-{
-    if (index < 0 || index >= mDids.size()) {
-        return nullptr;
-    }
-    return mDids.at(index);
-}
-
-int Identity::DestroyDid(int index)
-{
-    if (index < 0 || index >= mDids.size()) {
-        return E_WALLET_C_OUT_OF_RANGE;
-    }
-
-    std::shared_ptr<Did> did = mDids.at(index);
-    did.reset();
-    mDids[index] = nullptr;
+    std::shared_ptr<DidManager> mDidManager = std::make_shared<DidManager>(seed, mLocalPath);
+    *manager = mDidManager;
 
     return E_WALLET_C_OK;
 }
 
-void Identity::SetIndex(int index)
+std::shared_ptr<DidManager> Identity::GetDidManager()
 {
-    assert(index >= 0);
-    mIndex = index;
+    return mDidManager;
+}
+
+int Identity::DestroyDidManager()
+{
+    if (mDidManager == nullptr) {
+        return E_WALLET_C_OK;
+    }
+
+    mDidManager.reset();
+    mDidManager = nullptr;
+
+    return E_WALLET_C_OK;
+}
+
+void Identity::SetPosition(int pos)
+{
+    assert(pos >= 0);
+    mPosition = pos;
 }
 
 }

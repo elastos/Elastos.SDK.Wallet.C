@@ -10,8 +10,9 @@
 
 namespace elastos {
 
-Did::Did(const std::string& publicKey, const std::string& path)
+Did::Did(const std::string& publicKey, int index, const std::string& path)
     : mPublicKey(publicKey)
+    , mIndex(index)
     , mPath(path)
 {
     assert(!publicKey.empty());
@@ -25,7 +26,7 @@ std::string Did::GetId()
     return mDid;
 }
 
-std::string Did::SignInfo(const std::string& seed, int index, const std::string& json)
+std::string Did::SignInfo(const std::string& seed, const std::string& json)
 {
     uint8_t* buf;
     int len = GenDidUploadInfo(json, &buf);
@@ -34,7 +35,7 @@ std::string Did::SignInfo(const std::string& seed, int index, const std::string&
         return "";
     }
 
-    std::string signedInfo = SignInfo(seed, index, buf, len);
+    std::string signedInfo = SignInfo(seed, buf, len);
     if (signedInfo.empty()) {
         Log::E("Did", "sign did info failed\n");
         free(buf);
@@ -50,9 +51,9 @@ std::string Did::SignInfo(const std::string& seed, int index, const std::string&
     return memo.dump();
 }
 
-std::string Did::SetInfo(const std::string& seed, int index, const std::string& json, const std::shared_ptr<HDWallet>& wallet)
+std::string Did::SetInfo(const std::string& seed, const std::string& json, const std::shared_ptr<HDWallet>& wallet)
 {
-    std::string memo = SignInfo(seed, index, json);
+    std::string memo = SignInfo(seed, json);
     if (memo.empty()) {
         Log::E("Did", "sign did info and generate memo failed\n");
         return "";
@@ -143,16 +144,16 @@ std::string Did::GetInfo(const std::string& key)
     return "";
 }
 
-int Did::GetIndex()
+int Did::GetPosition()
 {
-    return mIndex;
+    return mPosition;
 }
 
-std::string Did::SignInfo(const std::string& seed, int index, const uint8_t* message, int len)
+std::string Did::SignInfo(const std::string& seed, const uint8_t* message, int len)
 {
     uint8_t* seedBuf;
     int seedLen = Utils::Str2Hex(seed, &seedBuf);
-    char* privateKey = generateSubPrivateKey(seedBuf, seedLen, COIN_TYPE_ELA, 0, index);
+    char* privateKey = generateSubPrivateKey(seedBuf, seedLen, COIN_TYPE_ELA, 0, mIndex);
     free(seedBuf);
 
     char* publicKey = getPublicKeyFromPrivateKey(privateKey);
@@ -207,9 +208,9 @@ int Did::GenDidUploadInfo(const std::string& json, uint8_t** buf)
     return len;
 }
 
-void Did::SetIndex(int index)
+void Did::SetPosition(int pos)
 {
-    mIndex = index;
+    mPosition = pos;
 }
 
 }

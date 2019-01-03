@@ -10,37 +10,38 @@ namespace elastos {
 class Did
 {
 public:
-    Did(const std::string& publicKey, const std::string& path);
+    Did(const std::string& publicKey, int index, const std::string& path);
 
     std::string GetId();
 
     // return signed info
-    std::string SignInfo(const std::string& seed, int index, const std::string& json);
+    std::string SignInfo(const std::string& seed, const std::string& json);
 
     // return txid
-    std::string SetInfo(const std::string& seed, int index, const std::string& json, const std::shared_ptr<HDWallet>& wallet);
+    std::string SetInfo(const std::string& seed, const std::string& json, const std::shared_ptr<HDWallet>& wallet);
 
     // sync the did info
     int SyncInfo();
 
     std::string GetInfo(const std::string& key);
 
-    int GetIndex();
+    int GetPosition();
 
 private:
     int GenDidUploadInfo(const std::string& json, uint8_t** buf);
 
-    std::string SignInfo(const std::string& seed, int index, const uint8_t* message, int len);
+    std::string SignInfo(const std::string& seed, const uint8_t* message, int len);
 
-    void SetIndex(int index);
+    void SetPosition(int pos);
 
 private:
     std::string mPublicKey;
     std::string mDid;
     std::string mPath;
-    int mIndex;
+    int mIndex = 0;
+    int mPosition = 0;
 
-    friend class Identity;
+    friend class DidManager;
 };
 
 }

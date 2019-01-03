@@ -8,6 +8,7 @@
 #include "Identity.h"
 #include "IdentityManager.h"
 #include "Did.h"
+#include "DidManager.h"
 
 using namespace elastos;
 
@@ -87,13 +88,20 @@ void TestSingleWallet()
     // balance = wallet->GetBalance();
     // printf("balance: %ld\n", balance);
 
+    std::shared_ptr<DidManager> manager;
+    int ret = identity->CreateDidManager(seed, &manager);
+    if (ret != 0) {
+        printf("create Did manager failed\n");
+        return;
+    }
+
     std::shared_ptr<Did> didObj;
-    index = identity->CreateDid(publicKey, &didObj);
+    index = manager->CreateDid(0, &didObj);
     std::string did = didObj->GetId();
     printf("did: %s\n", did.c_str());
 
     std::string str("[{\"Key\": \"name\", \"Value\":\"alice\"}]");
-    std::string info = didObj->SignInfo(seed, 0, str);
+    std::string info = didObj->SignInfo(seed, str);
     printf("signed info: %s\n", info.c_str());
 
     didObj->SyncInfo();

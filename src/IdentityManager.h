@@ -21,9 +21,9 @@ public:
 
     static int CreateIdentity(const std::string& localPath, std::shared_ptr<Identity>* identity);
 
-    static int DestroyIdentity(int index);
+    static int DestroyIdentity(int pos);
 
-    static std::shared_ptr<Identity> GetByIndex(int index);
+    static std::shared_ptr<Identity> GetByPosition(int pos);
 
 public:
     static std::vector<std::shared_ptr<Identity>> sIdentities;

@@ -32,7 +32,7 @@ public:
 
     int GetBalance(const std::string& address);
 
-    int GetIndex();
+    int GetPosition();
 
 private:
     int SingleAddressCreateTx(const std::vector<Transaction>& transactions, const std::string& seed, std::string& txJson);
@@ -46,11 +46,11 @@ private:
 
     int HttpPost(const std::string& api, const std::string& body, std::string& result);
 
-    void SetIndex(int index);
+    void SetPosition(int pos);
 
 private:
     std::unique_ptr<BlockChainNode> mBlockChainNode;
-    int mIndex = 0;
+    int mPosition = 0;
     int mCoinType = COIN_TYPE_ELA;
     bool mSingleAddress {false};
     std::unique_ptr<MasterPublicKey> mMasterPublicKey;
