@@ -21,6 +21,7 @@ struct History
     int mFee;
     std::string mInputs;
     std::string mOutputs;
+    std::string mMemo;
 };
 
 class CHistoryDb
@@ -35,6 +36,8 @@ public:
     int Delete(const std::string& txid, const std::string& address);
 
     int Query(const std::string& address, std::vector<History*>* pHistories);
+
+    int GetCount(const std::string& address, int* count);
 
 private:
     void CloseDb();

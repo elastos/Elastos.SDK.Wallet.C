@@ -18,7 +18,7 @@ int Identity::CreateSingleAddressWallet(const std::string& seed, std::shared_ptr
     std::string url(TEST_NET ? TEST_NET_WALLET_SERVICE_URL : WALLET_SERVICE_URL);
 
     std::unique_ptr<BlockChainNode> node = std::make_unique<BlockChainNode>(url);
-    std::shared_ptr<HDWallet> hdWallet = std::make_shared<HDWallet>(seed, node, true);
+    std::shared_ptr<HDWallet> hdWallet = std::make_shared<HDWallet>(mLocalPath, seed, node, true);
     mWallets.push_back(hdWallet);
     int index = mWallets.size() - 1;
 
@@ -36,7 +36,7 @@ int Identity::CreateWallet(const std::string& seed, int coinType, std::shared_pt
     std::string url(TEST_NET ? TEST_NET_WALLET_SERVICE_URL : WALLET_SERVICE_URL);
 
     std::unique_ptr<BlockChainNode> node = std::make_unique<BlockChainNode>(url);
-    std::shared_ptr<HDWallet> hdWallet = std::make_shared<HDWallet>(seed, node, coinType);
+    std::shared_ptr<HDWallet> hdWallet = std::make_shared<HDWallet>(mLocalPath, seed, node, coinType);
     mWallets.push_back(hdWallet);
     int pos = mWallets.size() - 1;
     hdWallet->SetPosition(pos);

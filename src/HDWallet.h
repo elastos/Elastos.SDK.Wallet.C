@@ -7,6 +7,7 @@
 #include "BlockChainNode.h"
 #include "Transaction.h"
 #include "Wallet.h"
+#include "wrapper/database/CHistoryDb.h"
 
 namespace elastos {
 
@@ -14,13 +15,13 @@ class HDWallet : public Wallet
 {
 public:
 
-    HDWallet(const std::string& seed, std::unique_ptr<BlockChainNode>& node, int coinType, bool singleAddress);
+    HDWallet(const std::string& localPath, const std::string& seed, std::unique_ptr<BlockChainNode>& node, int coinType, bool singleAddress);
 
-    HDWallet(const std::string& seed, std::unique_ptr<BlockChainNode>& node, int coinType);
+    HDWallet(const std::string& localPath, const std::string& seed, std::unique_ptr<BlockChainNode>& node, int coinType);
 
-    HDWallet(const std::string& seed, std::unique_ptr<BlockChainNode>& node, bool singleAddress);
+    HDWallet(const std::string& localPath, const std::string& seed, std::unique_ptr<BlockChainNode>& node, bool singleAddress);
 
-    HDWallet(const std::string& seed, std::unique_ptr<BlockChainNode>& node);
+    HDWallet(const std::string& localPath, const std::string& seed, std::unique_ptr<BlockChainNode>& node);
 
     int GetCoinType();
 
@@ -33,6 +34,8 @@ public:
     int GetBalance(const std::string& address);
 
     int GetPosition();
+
+    int SyncHistory();
 
 private:
     int SingleAddressCreateTx(const std::vector<Transaction>& transactions, const std::string& seed, std::string& txJson);
@@ -48,7 +51,14 @@ private:
 
     void SetPosition(int pos);
 
+    int SyncHistory(const std::string& address);
+
+    int GetHistroyAndSave(const std::string& address, int page, CHistoryDb& db, int* total = nullptr);
+
+    int SyncMultiHistory();
+
 private:
+    std::string mPath;
     std::unique_ptr<BlockChainNode> mBlockChainNode;
     int mPosition = 0;
     int mCoinType = COIN_TYPE_ELA;

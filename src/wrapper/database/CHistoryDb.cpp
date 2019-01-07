@@ -25,10 +25,10 @@ CHistoryDb::CHistoryDb(const std::string& filePath, const std::string& tableName
     if (CDbHelper::TableExist(mDb, tableName)) return;
 
     char sql[512];
-    sprintf(sql, "CREATE TABLE %s(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, txid TEXT NOT NULL, "
+    sprintf(sql, "CREATE TABLE '%s'(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, txid TEXT NOT NULL, "
         "address TEXT NOT NULL, direction TEXT NOT NULL, amount INTEGER NOT NULL, "
         "time INTEGER NOT NULL, height INTEGER NOT NULL, fee INTEGER NOT NULL,"
-        "inputs TEXT NOT NULL, outputs TEXT NOT NULL);", tableName.c_str());
+        "inputs TEXT NOT NULL, outputs TEXT NOT NULL, memo TEXT NOT NULL);", tableName.c_str());
 
     Log::D("Database", "%s\n", sql);
 
@@ -97,7 +97,7 @@ int CHistoryDb::Delete(const std::string& txid, const std::string& address)
 
     char* errMsg;
     char sql[512];
-    sprintf(sql, "DELETE FROM %s WHERE", mTableName.c_str());
+    sprintf(sql, "DELETE FROM '%s' WHERE", mTableName.c_str());
     if (!txid.empty()) {
         strcat(sql, " txid='");
         strcat(sql, txid.c_str());
@@ -135,7 +135,7 @@ int CHistoryDb::Query(const std::string& address, std::vector<History*>* pHistor
     char sql[512];
     sqlite3_stmt* pStmt = nullptr;
     int ret = E_SQL_WRAPPER_OK;
-    sprintf(sql, "SELECT * FROM %s WHERE address='%s'", mTableName.c_str(), address.c_str());
+    sprintf(sql, "SELECT * FROM '%s' WHERE address='%s'", mTableName.c_str(), address.c_str());
 
     ret = sqlite3_prepare_v2(mDb, sql, -1, &pStmt, NULL);
     if (ret != SQLITE_OK) {
@@ -169,8 +169,36 @@ int CHistoryDb::Query(const std::string& address, std::vector<History*>* pHistor
         char* outputs = (char*)sqlite3_column_text(pStmt, 9);
         pHistory->mOutputs.assign(outputs, strlen(outputs));
 
+        char* memo = (char*)sqlite3_column_text(pStmt, 10);
+        pHistory->mMemo.assign(memo, strlen(memo));
+
         pHistories->push_back(pHistory);
     }
+
+exit:
+    if (pStmt) {
+        sqlite3_finalize(pStmt);
+    }
+    return ret;
+}
+
+int CHistoryDb::GetCount(const std::string& address, int* count)
+{
+    char sql[128];
+    sprintf(sql, "SELECT COUNT(*) FROM '%s' WHERE address='%s'", mTableName.c_str(), address.c_str());
+    sqlite3_stmt* pStmt = nullptr;
+    int ret = sqlite3_prepare_v2(mDb, sql, -1, &pStmt, NULL);
+    if (ret != SQLITE_OK) {
+        goto exit;
+    }
+
+    ret = sqlite3_step(pStmt);
+    if (SQLITE_OK != ret && SQLITE_DONE != ret && SQLITE_ROW != ret) {
+        goto exit;
+    }
+
+    *count = sqlite3_column_int(pStmt, 0);
+    ret = SQLITE_OK;
 
 exit:
     if (pStmt) {
@@ -190,13 +218,14 @@ void CHistoryDb::CloseDb()
 std::string CHistoryDb::CreateInsertSql(const History& history)
 {
     std::stringstream stream;
-    stream << "INSERT OR REPLACE INTO " << mTableName;
-    stream << "(id,txid,address,direction,amount,time,height,fee,inputs,outputs) VALUES (";
-    stream << "(SELECT id FROM " << mTableName << " WHERE txid='" << history.mTxid << "' AND";
+    stream << "INSERT OR REPLACE INTO '" << mTableName;
+    stream << "'(id,txid,address,direction,amount,time,height,fee,inputs,outputs,memo) VALUES (";
+    stream << "(SELECT id FROM '" << mTableName << "' WHERE txid='" << history.mTxid << "' AND";
     stream << " address='" << history.mAddress << "'),'";
     stream << history.mTxid << "','" << history.mAddress << "','" << history.mDirection << "',";
     stream << history.mAmount << "," << history.mTime << "," << history.mHeight << ",";
-    stream << history.mFee << ",'" << history.mInputs << "','" << history.mOutputs << "');";
+    stream << history.mFee << ",'" << history.mInputs << "','" << history.mOutputs << "','";
+    stream << history.mMemo << "');";
     return stream.str();
 }
 
