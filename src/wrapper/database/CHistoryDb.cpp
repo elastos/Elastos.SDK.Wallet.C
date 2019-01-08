@@ -123,7 +123,7 @@ int CHistoryDb::Delete(const std::string& txid, const std::string& address)
     return E_SQL_WRAPPER_OK;
 }
 
-int CHistoryDb::Query(const std::string& address, std::vector<History*>* pHistories)
+int CHistoryDb::Query(const std::string& address, int pageSize, int page, bool ascending, std::vector<std::shared_ptr<History>>* pHistories)
 {
     if (!mDb) {
         return E_SQL_WRAPPER_DB_OPEN;
@@ -135,7 +135,9 @@ int CHistoryDb::Query(const std::string& address, std::vector<History*>* pHistor
     char sql[512];
     sqlite3_stmt* pStmt = nullptr;
     int ret = E_SQL_WRAPPER_OK;
-    sprintf(sql, "SELECT * FROM '%s' WHERE address='%s'", mTableName.c_str(), address.c_str());
+    int offset = page == 0 ? 0 : page * pageSize;
+    sprintf(sql, "SELECT * FROM '%s' WHERE address='%s' ORDER BY time %s LIMIT %d OFFSET %d;",
+            mTableName.c_str(), address.c_str(), ascending ? "ASC" : "DESC", pageSize, offset);
 
     ret = sqlite3_prepare_v2(mDb, sql, -1, &pStmt, NULL);
     if (ret != SQLITE_OK) {
@@ -144,7 +146,7 @@ int CHistoryDb::Query(const std::string& address, std::vector<History*>* pHistor
     }
 
     while(SQLITE_ROW == sqlite3_step(pStmt)) {
-        History* pHistory = new History();
+        std::shared_ptr<History> pHistory = std::make_shared<History>();
         if (!pHistory) {
             ret = E_SQL_WRAPPER_OUT_OF_MEMORY;
             goto exit;

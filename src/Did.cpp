@@ -43,10 +43,11 @@ std::string Did::SignInfo(const std::string& seed, const std::string& json)
         return "";
     }
 
-    nlohmann::json memo;
-    memo["msg"] = Utils::Hex2Str(buf, len).c_str();
-    memo["pub"] = mPublicKey;
-    memo["sig"] = signedInfo.c_str();
+    nlohmann::json memo = {
+        {"msg", Utils::Hex2Str(buf, len).c_str()},
+        {"pub", mPublicKey},
+        {"sig", signedInfo.c_str()}
+    };
     free(buf);
 
     return memo.dump();
@@ -150,12 +151,13 @@ std::string Did::GetInfo(const std::string& key)
         return "";
     }
 
-    nlohmann::json jpro;
-    jpro["did"] = mDid;
-    jpro["key"] = key;
-    jpro["value"] = property.mProperty;
-    jpro["blockTime"] = property.mBlockTime;
-    jpro["txid"] = property.mTxid;
+    nlohmann::json jpro = {
+        {"did", mDid},
+        {"key", key},
+        {"value", property.mProperty},
+        {"blockTime", property.mBlockTime},
+        {"txid", property.mTxid}
+    };
     return jpro.dump();
 }
 

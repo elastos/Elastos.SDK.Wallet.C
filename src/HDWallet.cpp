@@ -8,6 +8,8 @@
 
 
 #define CLASS_TEXT "HDWallet"
+#define HISTORY_PAGE_SIZE   10
+#define HTTP_TIME_OUT       10000
 
 namespace elastos {
 
@@ -92,6 +94,8 @@ int HDWallet::SendTransaction(const std::vector<Transaction>& transactions, cons
 
     txid = jRet["result"];
 
+    InsertSendingTx(transactions, txid, txJson);
+
     return E_WALLET_C_OK;
 }
 
@@ -115,7 +119,7 @@ std::string HDWallet::GetPublicKey(int chain, int index)
     return ret;
 }
 
-int HDWallet::GetBalance(const std::string& address)
+long HDWallet::GetBalance(const std::string& address)
 {
     HttpClient httpClient;
     HttpClient::InitGlobal();
@@ -127,7 +131,7 @@ int HDWallet::GetBalance(const std::string& address)
     Log::D(CLASS_TEXT, "url: %s\n", url.c_str());
 
     httpClient.Url(url);
-    httpClient.SetTimeout(5000);
+    httpClient.SetTimeout(HTTP_TIME_OUT);
     httpClient.SetHeader("Accept-Encoding", "identity");
     int ret = httpClient.SyncGet();
     if (ret != E_WALLET_C_OK) {
@@ -175,6 +179,65 @@ int HDWallet::SyncHistory()
     else {
         return SyncMultiHistory();
     }
+}
+
+int HDWallet::GetHistoryCount(const std::string& address)
+{
+    if (address.empty()) {
+        return E_WALLET_C_INVALID_ARGUMENT;
+    }
+
+    CHistoryDb db(mPath, GetTableName());
+    int count;
+    int ret = db.GetCount(address, &count);
+    if (ret != E_WALLET_C_OK) {
+        return 0;
+    }
+
+    return count;
+}
+
+int HDWallet::GetHistory(const std::string& address, int pageSize, int page, bool ascending, std::string& histories)
+{
+    if (address.empty() || pageSize <= 0 || page < 0) {
+        return E_WALLET_C_INVALID_ARGUMENT;
+    }
+
+    CHistoryDb db(mPath, GetTableName());
+    std::vector<std::shared_ptr<History>> historyVector;
+    int ret = db.Query(address, pageSize, page, ascending, &historyVector);
+    if (ret != E_WALLET_C_OK) {
+        Log::E(CLASS_TEXT, "query %s history failed ret:%d\n", address.c_str(), ret);
+        return ret;
+    }
+
+    if (historyVector.empty()) {
+        Log::D(CLASS_TEXT, "%s no history\n", address.c_str());
+        histories.clear();
+        return E_WALLET_C_OK;
+    }
+
+    nlohmann::json jHistories;
+    std::vector<nlohmann::json> jHistoryVector;
+    for (std::shared_ptr<History> history : historyVector) {
+        nlohmann::json jHistory = {
+            {"txid", history->mTxid},
+            {"direction", history->mDirection},
+            {"value", history->mAmount},
+            {"time", history->mTime},
+            {"height", history->mHeight},
+            {"fee", history->mFee},
+            {"inputs", history->mInputs},
+            {"outputs", history->mOutputs},
+            {"memo", history->mMemo}
+        };
+
+        jHistoryVector.push_back(jHistory);
+    }
+    jHistories = jHistoryVector;
+    histories = jHistories.dump();
+
+    return E_WALLET_C_OK;
 }
 
 int HDWallet::SingleAddressCreateTx(const std::vector<Transaction>& transactions, const std::string& seed, std::string& txJson)
@@ -275,7 +338,7 @@ int HDWallet::HttpPost(const std::string& api, const std::string& body, std::str
         return ret;
     }
 
-    httpClient.SetTimeout(10000);
+    httpClient.SetTimeout(HTTP_TIME_OUT);
     httpClient.SetHeader("Content-Type", "application/json");
 
     ret = httpClient.SyncPost(body.c_str());
@@ -304,38 +367,33 @@ void HDWallet::SetPosition(int pos)
 
 int HDWallet::SyncHistory(const std::string& address)
 {
-    //remove the protocol
-    std::string url = mBlockChainNode->GetUrl();
-    int pos = url.find(':');
-    pos = pos == std::string::npos ? 0 : pos + 3;
-
-    CHistoryDb db(mPath, url.substr(pos));
+    CHistoryDb db(mPath, GetTableName());
     int count = 0;
     int ret = db.GetCount(address, &count);
     if (ret != E_WALLET_C_OK) {
         Log::E(CLASS_TEXT, "SyncHistory get count from db failed ret:%d\n", ret);
         return ret;
     }
-    int pageNum = floor(count / 20) + 1;
+    int pageNum = floor(count / HISTORY_PAGE_SIZE) + 1;
     Log::D(CLASS_TEXT, "history count: %d, page: %d\n", count, pageNum);
 
     int total = 0;
-    ret = GetHistroyAndSave(address, pageNum, db, &total);
+    ret = GetHistoryAndSave(address, pageNum, db, &total);
     if (ret < 0) {
-        Log::E(CLASS_TEXT, "get histroy and save failed ret:%d\n", ret);
+        Log::E(CLASS_TEXT, "get history and save failed ret:%d\n", ret);
         return ret;
     }
 
-    if (ret == 0 || total <= pageNum * 20) {
+    if (ret == 0 || total <= pageNum * HISTORY_PAGE_SIZE) {
         return E_WALLET_C_OK;
     }
 
-    int pages = ceil(total / 20);
-    Log::D(CLASS_TEXT, "history total: %d, pages: %d\n", total, pages);
+    double pages = std::ceil((double)total / HISTORY_PAGE_SIZE);
+    Log::D(CLASS_TEXT, "history total: %d, pages: %f\n", total, pages);
     while (++pageNum <= pages) {
-        ret = GetHistroyAndSave(address, pageNum, db);
+        ret = GetHistoryAndSave(address, pageNum, db);
         if (ret < 0) {
-            Log::E(CLASS_TEXT, "get histroy and save failed ret:%d\n", ret);
+            Log::E(CLASS_TEXT, "get history and save failed ret:%d\n", ret);
             return ret;
         }
     }
@@ -343,7 +401,7 @@ int HDWallet::SyncHistory(const std::string& address)
     return E_WALLET_C_OK;
 }
 
-int HDWallet::GetHistroyAndSave(const std::string& address, int page, CHistoryDb& db, int* total)
+int HDWallet::GetHistoryAndSave(const std::string& address, int page, CHistoryDb& db, int* total)
 {
     HttpClient httpClient;
     HttpClient::InitGlobal();
@@ -351,13 +409,15 @@ int HDWallet::GetHistroyAndSave(const std::string& address, int page, CHistoryDb
     std::string url = TEST_NET ? TEST_NET_WALLET_SERVICE_URL : WALLET_SERVICE_URL;
     url.append("/api/1/history/");
     url.append(address);
-    url.append("?pageSize=20&pageNum=");
+    url.append("?pageSize=");
+    url.append(std::to_string(HISTORY_PAGE_SIZE));
+    url.append("&pageNum=");
     url.append(std::to_string(page));
 
     Log::D(CLASS_TEXT, "url: %s\n", url.c_str());
 
     httpClient.Url(url);
-    httpClient.SetTimeout(5000);
+    httpClient.SetTimeout(HTTP_TIME_OUT);
     httpClient.SetHeader("Content-Type", "application/json");
     int ret = httpClient.SyncGet();
     if (ret != E_WALLET_C_OK) {
@@ -441,6 +501,63 @@ int HDWallet::GetHistroyAndSave(const std::string& address, int page, CHistoryDb
 int HDWallet::SyncMultiHistory()
 {
     return E_WALLET_C_NOT_IMPLEMENTED;
+}
+
+std::string HDWallet::GetTableName()
+{
+    std::string url = mBlockChainNode->GetUrl();
+    int pos = url.find(':');
+    pos = pos == std::string::npos ? 0 : pos + 3;
+
+    return url.substr(pos);
+}
+
+int HDWallet::InsertSendingTx(const std::vector<Transaction>& transactions, const std::string& txid, const std::string& tx)
+{
+    if (!mSingleAddress) {
+        return E_WALLET_C_NOT_IMPLEMENTED;
+    }
+
+    long amount = 0l;
+    for (Transaction transaction : transactions) {
+        amount += transaction.GetAmount();
+    }
+
+    History history;
+    history.mTxid = txid;
+    history.mAddress = GetAddress(0, 0);
+    history.mDirection = "spending";
+    history.mAmount = amount;
+    history.mTime = time(0);
+    history.mHeight = 0;
+
+    nlohmann::json jTx = nlohmann::json::parse(tx);
+    std::vector<nlohmann::json> inputsVector = jTx["Transactions"][0]["UTXOInputs"];
+    std::string inputs;
+    for (int i = 0; i < inputsVector.size(); i++) {
+        inputs.append(inputsVector[i]["address"].get<std::string>());
+        if (i != inputsVector.size() - 1) {
+            inputs.append(";");
+        }
+    }
+    history.mInputs = inputs;
+
+    std::vector<nlohmann::json> outputsVector = jTx["Transactions"][0]["Outputs"];
+    std::string outputs;
+    for (int i = 0; i < outputsVector.size(); i++) {
+        outputs.append(outputsVector[i]["address"].get<std::string>());
+        if (i != outputsVector.size() - 1) {
+            outputs.append(";");
+        }
+    }
+    history.mOutputs = outputs;
+    history.mMemo = "";
+
+    std::vector<History> historyVector;
+    historyVector.push_back(history);
+    CHistoryDb db(mPath, GetTableName());
+
+    return db.Insert(historyVector);
 }
 
 } // namespace elastos

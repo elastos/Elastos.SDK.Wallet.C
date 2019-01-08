@@ -46,6 +46,7 @@ char* readMnemonicFile(const char* path)
 
 void TestSingleWallet()
 {
+    int ret;
     const char* mnemonic = "血 坝 告 售 代 讨 转 枝 欧 旦 诚 抱";
     const char* path = "/Users/nathansfile/Elastos.ORG.Wallet.Lib.C/src/Data/mnemonic_chinese.txt";
     char* words = readMnemonicFile(path);
@@ -73,11 +74,14 @@ void TestSingleWallet()
     long balance = hdWallet->GetBalance(hdSingleAddress);
     printf("balance: %ld\n", balance);
 
+    hdWallet->SyncHistory();
+
+
     // Transaction tx("EdyqqiJcdkTDtfkvxVbTuNXGMdB3FEcpXA", 100000000L, "");
     // std::vector<Transaction> transactions;
     // transactions.push_back(tx);
     // std::string txid;
-    // int ret = hdWallet->SendTransaction(transactions, seed, txid);
+    // ret = hdWallet->SendTransaction(transactions, seed, txid);
     // if (ret != E_WALLET_C_OK) {
     //     printf("send transaction failed: %d\n", ret);
     //     return;
@@ -85,11 +89,17 @@ void TestSingleWallet()
 
     // printf("txid: %s\n", txid.c_str());
 
+
+    std::string histories;
+    int count = hdWallet->GetHistoryCount(hdSingleAddress);
+    hdWallet->GetHistory(hdSingleAddress, 5, 0, false, histories);
+    printf("history: %s\n", histories.c_str());
+
     // balance = wallet->GetBalance();
     // printf("balance: %ld\n", balance);
 
     std::shared_ptr<DidManager> manager;
-    int ret = identity->CreateDidManager(seed, &manager);
+    ret = identity->CreateDidManager(seed, &manager);
     if (ret != 0) {
         printf("create Did manager failed\n");
         return;

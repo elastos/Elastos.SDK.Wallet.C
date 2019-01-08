@@ -52,26 +52,22 @@ void TestHistory() {
         return;
     }
 
-    std::vector<History*> query;
-    ret = historyDb.Query("EMHc9JSpxKWbTMf8gQDcWm7Tz1C5nQNA8Z", &query);
+    std::vector<std::shared_ptr<History>> query;
+    ret = historyDb.Query("EMHc9JSpxKWbTMf8gQDcWm7Tz1C5nQNA8Z", 5, 0, true, &query);
     if (ret != E_SQL_WRAPPER_OK) {
         printf("query failed %d\n", ret);
     }
 
-    for (History* pHistory : query) {
-        delete pHistory;
-    }
     query.clear();
 
-    ret = historyDb.Query("EbAATdrW7gaomFY3SAy81rokqwqKA3EXbT", &query);
+    ret = historyDb.Query("EbAATdrW7gaomFY3SAy81rokqwqKA3EXbT", 5, 0, true, &query);
     if (ret != E_SQL_WRAPPER_OK) {
         printf("query failed %d\n", ret);
     }
 
-    for (History* pHistory : query) {
+    for (std::shared_ptr<History> pHistory : query) {
         printf("id: %d\n", pHistory->mId);
         printf("txid: %s\n", pHistory->mTxid.c_str());
-        delete pHistory;
     }
 
     ret = historyDb.Delete("1e368ad6af41fb626d35f6e2dac238b6b64bfadcf3d3f297919f81029e0027ff", "EbAATdrW7gaomFY3SAy81rokqwqKA3EXbT");

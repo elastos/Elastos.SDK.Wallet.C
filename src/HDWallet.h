@@ -31,11 +31,15 @@ public:
 
     std::string GetPublicKey(int chain, int index);
 
-    int GetBalance(const std::string& address);
+    long GetBalance(const std::string& address);
 
     int GetPosition();
 
     int SyncHistory();
+
+    int GetHistoryCount(const std::string& address);
+
+    int GetHistory(const std::string& address, int pageSize, int page, bool ascending, std::string& histories);
 
 private:
     int SingleAddressCreateTx(const std::vector<Transaction>& transactions, const std::string& seed, std::string& txJson);
@@ -53,9 +57,13 @@ private:
 
     int SyncHistory(const std::string& address);
 
-    int GetHistroyAndSave(const std::string& address, int page, CHistoryDb& db, int* total = nullptr);
+    int GetHistoryAndSave(const std::string& address, int page, CHistoryDb& db, int* total = nullptr);
 
     int SyncMultiHistory();
+
+    std::string GetTableName();
+
+    int InsertSendingTx(const std::vector<Transaction>& transactions, const std::string& txid, const std::string& tx);
 
 private:
     std::string mPath;

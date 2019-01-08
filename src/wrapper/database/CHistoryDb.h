@@ -17,8 +17,8 @@ struct History
     std::string mDirection;
     long mAmount;
     long mTime;
-    long mHeight;
-    int mFee;
+    long mHeight = 0;
+    int mFee = 100;
     std::string mInputs;
     std::string mOutputs;
     std::string mMemo;
@@ -35,7 +35,7 @@ public:
 
     int Delete(const std::string& txid, const std::string& address);
 
-    int Query(const std::string& address, std::vector<History*>* pHistories);
+    int Query(const std::string& address, int pageSize, int page, bool ascending, std::vector<std::shared_ptr<History>>* pHistories);
 
     int GetCount(const std::string& address, int* count);
 
