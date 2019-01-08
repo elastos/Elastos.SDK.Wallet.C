@@ -3,10 +3,9 @@
 
 namespace elastos {
 
-Transaction::Transaction(const std::string& address, long amount, const std::string& memo, int coinType)
+Transaction::Transaction(const std::string& address, long amount, int coinType)
     : mAddress(address)
     , mAmount(amount)
-    , mMemo(memo)
     , mCoinType(coinType)
 {}
 
@@ -21,11 +20,6 @@ void Transaction::SetAmount(long amount)
     mAmount = amount;
 }
 
-void Transaction::SetMemo(const std::string& memo)
-{
-    mMemo = memo;
-}
-
 int Transaction::GetCoinType()
 {
     return mCoinType;
@@ -34,11 +28,6 @@ int Transaction::GetCoinType()
 std::string Transaction::GetAddress()
 {
     return mAddress;
-}
-
-std::string Transaction::GetMemo()
-{
-    return mMemo;
 }
 
 long Transaction::GetAmount()

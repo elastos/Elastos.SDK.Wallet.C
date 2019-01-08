@@ -77,11 +77,11 @@ void TestSingleWallet()
     hdWallet->SyncHistory();
 
 
-    // Transaction tx("EdyqqiJcdkTDtfkvxVbTuNXGMdB3FEcpXA", 100000000L, "");
+    // Transaction tx("EdyqqiJcdkTDtfkvxVbTuNXGMdB3FEcpXA", 100000000L);
     // std::vector<Transaction> transactions;
     // transactions.push_back(tx);
     // std::string txid;
-    // ret = hdWallet->SendTransaction(transactions, seed, txid);
+    // ret = hdWallet->SendTransaction(transactions, "test memo", seed, txid);
     // if (ret != E_WALLET_C_OK) {
     //     printf("send transaction failed: %d\n", ret);
     //     return;

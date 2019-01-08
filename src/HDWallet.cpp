@@ -52,7 +52,7 @@ int HDWallet::GetCoinType()
     return mCoinType;
 }
 
-int HDWallet::SendTransaction(const std::vector<Transaction>& transactions, const std::string& seed, std::string& txid)
+int HDWallet::SendTransaction(const std::vector<Transaction>& transactions, const std::string& memo, const std::string& seed, std::string& txid)
 {
     if (transactions.empty() || seed.empty()) {
         return E_WALLET_C_INVALID_ARGUMENT;
@@ -61,10 +61,10 @@ int HDWallet::SendTransaction(const std::vector<Transaction>& transactions, cons
     std::string txJson;
     int ret;
     if (mSingleAddress) {
-        ret = SingleAddressCreateTx(transactions, seed, txJson);
+        ret = SingleAddressCreateTx(transactions, memo, seed, txJson);
     }
     else {
-        ret = HDCreateTx(transactions, seed, txJson);
+        ret = HDCreateTx(transactions, memo, seed, txJson);
     }
     if (ret != E_WALLET_C_OK) {
         Log::E(CLASS_TEXT, "create transaction failed ret:%d\n", ret);
@@ -94,7 +94,7 @@ int HDWallet::SendTransaction(const std::vector<Transaction>& transactions, cons
 
     txid = jRet["result"];
 
-    InsertSendingTx(transactions, txid, txJson);
+    InsertSendingTx(transactions, memo, txid, txJson);
 
     return E_WALLET_C_OK;
 }
@@ -240,7 +240,7 @@ int HDWallet::GetHistory(const std::string& address, int pageSize, int page, boo
     return E_WALLET_C_OK;
 }
 
-int HDWallet::SingleAddressCreateTx(const std::vector<Transaction>& transactions, const std::string& seed, std::string& txJson)
+int HDWallet::SingleAddressCreateTx(const std::vector<Transaction>& transactions, const std::string& memo, const std::string& seed, std::string& txJson)
 {
     std::vector<std::string> addresses;
     std::string address = GetAddress(0, 0);
@@ -267,6 +267,9 @@ int HDWallet::SingleAddressCreateTx(const std::vector<Transaction>& transactions
     free(seedBuf);
 
     jResult["Transactions"][0]["UTXOInputs"][0]["privateKey"] = privateKey;
+    if (!memo.empty()) {
+        jResult["Transactions"][0]["Memo"] = memo;
+    }
 
     Log::D(CLASS_TEXT, "transaction: %s\n", jResult.dump().c_str());
 
@@ -276,7 +279,7 @@ int HDWallet::SingleAddressCreateTx(const std::vector<Transaction>& transactions
     return E_WALLET_C_OK;
 }
 
-int HDWallet::HDCreateTx(const std::vector<Transaction>& transactions, const std::string& seed, std::string& txJson)
+int HDWallet::HDCreateTx(const std::vector<Transaction>& transactions, const std::string& memo, const std::string& seed, std::string& txJson)
 {
     return E_WALLET_C_NOT_IMPLEMENTED;
 }
@@ -311,6 +314,7 @@ int HDWallet::CreateTransaction(const std::vector<Transaction>& transactions,
         }
     }
     body << "]}";
+
     Log::D(CLASS_TEXT, "body: %s\n", body.str().c_str());
 
     return HttpPost("/api/1/createTx", body.str(), txJson);
@@ -512,7 +516,7 @@ std::string HDWallet::GetTableName()
     return url.substr(pos);
 }
 
-int HDWallet::InsertSendingTx(const std::vector<Transaction>& transactions, const std::string& txid, const std::string& tx)
+int HDWallet::InsertSendingTx(const std::vector<Transaction>& transactions, const std::string& memo, const std::string& txid, const std::string& tx)
 {
     if (!mSingleAddress) {
         return E_WALLET_C_NOT_IMPLEMENTED;
@@ -551,7 +555,7 @@ int HDWallet::InsertSendingTx(const std::vector<Transaction>& transactions, cons
         }
     }
     history.mOutputs = outputs;
-    history.mMemo = "";
+    history.mMemo = memo;
 
     std::vector<History> historyVector;
     historyVector.push_back(history);

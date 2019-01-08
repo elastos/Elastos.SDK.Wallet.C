@@ -61,11 +61,11 @@ std::string Did::SetInfo(const std::string& seed, const std::string& json, const
         return "";
     }
 
-    Transaction tx(wallet->GetAddress(0, 0), 100, memo);
+    Transaction tx(wallet->GetAddress(0, 0), 100);
     std::vector<Transaction> transactions;
     transactions.push_back(tx);
     std::string txid;
-    int ret = wallet->SendTransaction(transactions, seed, txid);
+    int ret = wallet->SendTransaction(transactions, memo, seed, txid);
     if (ret != E_WALLET_C_OK) {
         Log::E("Did", "send transaction failed: %d\n", ret);
         return "";

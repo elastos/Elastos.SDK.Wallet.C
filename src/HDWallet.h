@@ -25,7 +25,7 @@ public:
 
     int GetCoinType();
 
-    int SendTransaction(const std::vector<Transaction>& transactions, const std::string& seed, std::string& txid);
+    int SendTransaction(const std::vector<Transaction>& transactions, const std::string& memo, const std::string& seed, std::string& txid);
 
     std::string GetAddress(int chain, int index);
 
@@ -42,9 +42,9 @@ public:
     int GetHistory(const std::string& address, int pageSize, int page, bool ascending, std::string& histories);
 
 private:
-    int SingleAddressCreateTx(const std::vector<Transaction>& transactions, const std::string& seed, std::string& txJson);
+    int SingleAddressCreateTx(const std::vector<Transaction>& transactions, const std::string& memo, const std::string& seed, std::string& txJson);
 
-    int HDCreateTx(const std::vector<Transaction>& transactions, const std::string& seed, std::string& txJson);
+    int HDCreateTx(const std::vector<Transaction>& transactions, const std::string& memo, const std::string& seed, std::string& txJson);
 
     int CreateTransaction(const std::vector<Transaction>& transactions,
             const std::vector<std::string>& addresses, std::string& txJson);
@@ -63,7 +63,7 @@ private:
 
     std::string GetTableName();
 
-    int InsertSendingTx(const std::vector<Transaction>& transactions, const std::string& txid, const std::string& tx);
+    int InsertSendingTx(const std::vector<Transaction>& transactions, const std::string& memo, const std::string& txid, const std::string& tx);
 
 private:
     std::string mPath;
