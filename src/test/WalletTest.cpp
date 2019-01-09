@@ -63,8 +63,9 @@ void TestSingleWallet()
     printf("identity index:%d\n", index);
 
 
+    std::unique_ptr<BlockChainNode> node1 = std::make_unique<BlockChainNode>(TEST_NET_WALLET_SERVICE_URL);
     std::shared_ptr<HDWallet> hdWallet;
-    index = identity->CreateSingleAddressWallet(seed, &hdWallet);
+    index = identity->CreateSingleAddressWallet(seed, node1, &hdWallet);
     printf("hd wallet index:%d\n", index);
 
     std::string publicKey = hdWallet->GetPublicKey(0, 0);
@@ -74,14 +75,23 @@ void TestSingleWallet()
     long balance = hdWallet->GetBalance(hdSingleAddress);
     printf("balance: %ld\n", balance);
 
-    hdWallet->SyncHistory();
+    // hdWallet->SyncHistory();
+
+    std::unique_ptr<BlockChainNode> node = std::make_unique<BlockChainNode>(TEST_NET_DID_SERVICE_URL);
+    std::shared_ptr<HDWallet> idChainWallet;
+    index = identity->CreateSingleAddressWallet(seed, node, &idChainWallet);
+
+    balance = idChainWallet->GetBalance(hdSingleAddress);
+    printf("id chain balance: %ld\n", balance);
+
+    idChainWallet->SyncHistory();
 
 
-    // Transaction tx("EdyqqiJcdkTDtfkvxVbTuNXGMdB3FEcpXA", 100000000L);
+    // Transaction tx(hdSingleAddress, 100000000L);
     // std::vector<Transaction> transactions;
     // transactions.push_back(tx);
     // std::string txid;
-    // ret = hdWallet->SendTransaction(transactions, "test memo", seed, txid);
+    // ret = hdWallet->SendTransaction(transactions, "cross chain transaction", seed, txid, "idchain");
     // if (ret != E_WALLET_C_OK) {
     //     printf("send transaction failed: %d\n", ret);
     //     return;

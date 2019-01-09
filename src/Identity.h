@@ -17,9 +17,9 @@ public:
 
     Identity(const std::string& localPath);
 
-    int CreateSingleAddressWallet(const std::string& seed, std::shared_ptr<HDWallet>* wallet);
+    int CreateSingleAddressWallet(const std::string& seed, std::unique_ptr<BlockChainNode>& node, std::shared_ptr<HDWallet>* wallet);
 
-    int CreateWallet(const std::string& seed, int coinType, std::shared_ptr<HDWallet>* wallet);
+    int CreateWallet(const std::string& seed, int coinType, std::unique_ptr<BlockChainNode>& node, std::shared_ptr<HDWallet>* wallet);
 
     // int GetWallet(const std::string& seed, const std::vector<std::string>& publicKeys,
     //         const std::string& privateKey, int requiredCount, int coinType,
