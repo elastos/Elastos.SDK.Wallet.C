@@ -120,10 +120,16 @@ void TestSingleWallet()
     std::string did = didObj->GetId();
     printf("did: %s\n", did.c_str());
 
-    std::string str("[{\"Key\": \"name\", \"Value\":\"alice\"}]");
-    std::string info = didObj->SignInfo(seed, str);
-    printf("signed info: %s\n", info.c_str());
+    // std::string str("[{\"Key\": \"name\", \"Value\":\"alice\"}]");
+    // std::string info = didObj->SignInfo(seed, str);
+    // printf("signed info: %s\n", info.c_str());
+
+    // std::string txid = didObj->SetInfo(seed, str, idChainWallet);
+    // printf("did set info txid: %s\n", txid.c_str());
 
     didObj->SyncInfo();
+
+    std::string info = didObj->GetInfo("name");
+    printf("the did info: %s\n", info.c_str());
 
 }

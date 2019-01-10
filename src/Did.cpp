@@ -61,7 +61,7 @@ std::string Did::SetInfo(const std::string& seed, const std::string& json, const
         return "";
     }
 
-    Transaction tx(wallet->GetAddress(0, 0), 100);
+    Transaction tx(DID_SET_PROPERTY_TX_ADDRESS, DID_SET_PROPERTY_FEE);
     std::vector<Transaction> transactions;
     transactions.push_back(tx);
     std::string txid;
@@ -127,8 +127,8 @@ int Did::SyncInfo()
     std::vector<DidProperty> properties;
     for (nlohmann::json property : jProperties) {
         DidProperty dp;
-        dp.mKey = property["key"];
-        dp.mProperty = property["value"];
+        dp.mKey = property["propertyKey"];
+        dp.mProperty = property["propertyValue"];
         dp.mDid = mDid;
         dp.mBlockTime = property["blockTime"];
         dp.mHeight = property["height"];
@@ -200,6 +200,7 @@ int Did::GenDidUploadInfo(const std::string& json, uint8_t** buf)
     didInfo["Tag"] = "DID Property";
     didInfo["Ver"] = "1.0";
     didInfo["Status"] = "Normal";
+    // TODO: "Did" is compatible with did service, remove it later.
     didInfo["Did"] = mDid;
     for (int i = 0; i < properties.size(); i++) {
         properties[i]["Status"] = "Normal";

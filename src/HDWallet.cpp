@@ -122,49 +122,33 @@ std::string HDWallet::GetPublicKey(int chain, int index)
 
 long HDWallet::GetBalance(const std::string& address)
 {
-    HttpClient httpClient;
-    HttpClient::InitGlobal();
+    CHistoryDb db(mPath, GetTableName());
 
-    std::string url = mBlockChainNode->GetUrl();
-    url.append("/api/1/balance/");
-    url.append(address);
-
-    Log::D(CLASS_TEXT, "url: %s\n", url.c_str());
-
-    httpClient.Url(url);
-    httpClient.SetTimeout(HTTP_TIME_OUT);
-    httpClient.SetHeader("Accept-Encoding", "identity");
-    int ret = httpClient.SyncGet();
+    int count;
+    int ret = db.GetCount(address, &count);
     if (ret != E_WALLET_C_OK) {
-        Log::E(CLASS_TEXT, "http get balance failed ret:%d\n", ret);
+        Log::E(CLASS_TEXT, "get history count failed\n");
         return 0;
     }
 
-    ret = httpClient.GetResponseStatus();
-    if (ret != 200) {
-        Log::E(CLASS_TEXT, "http get balance status: %d\n", ret);
+    std::vector<std::shared_ptr<History>> histories;
+    ret = db.Query(address, count, 0, true, &histories);
+    if (ret != E_WALLET_C_OK) {
+        Log::E(CLASS_TEXT, "get history failed\n");
         return 0;
     }
 
-    std::string bodyStr;
-    ret = httpClient.GetResponseBody(bodyStr);
-    if (ret < 0) {
-        Log::E(CLASS_TEXT, "http get balance response: %d\n", ret);
-        return 0;
+    long balance = 0;
+    for (std::shared_ptr<History> history : histories) {
+        if (!history->mDirection.compare("income")) {
+            balance += history->mAmount;
+        }
+        else {
+            balance -= history->mAmount;
+        }
     }
 
-    Log::D(CLASS_TEXT, "response: %s\n", bodyStr.c_str());
-    nlohmann::json jReslut = nlohmann::json::parse(bodyStr);
-    if (jReslut["status"] != 200) {
-        std::string result = jReslut["result"];
-        Log::E(CLASS_TEXT, "get balance failed: %s\n", result.c_str());
-        return 0;
-    }
-
-    std::string result = jReslut["result"];
-    double balance = std::stod(result);
-
-    return balance * 100000000;
+    return balance;
 }
 
 int HDWallet::GetPosition()

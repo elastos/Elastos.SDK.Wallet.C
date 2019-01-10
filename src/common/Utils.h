@@ -17,6 +17,10 @@ namespace elastos {
 #define TEST_DB_FILE    "ElastosWalletTest.db"
 #define DB_FILE         "ElastosWallet.db"
 
+// TODO: read the address from config file
+#define DID_SET_PROPERTY_TX_ADDRESS         "EZAw49S3is7bqbhwdJPfEDGd9CgbY9HBmj"
+#define DID_SET_PROPERTY_FEE                10000
+
 class Utils {
 
 public:
