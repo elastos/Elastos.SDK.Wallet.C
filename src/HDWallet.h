@@ -8,6 +8,7 @@
 #include "Transaction.h"
 #include "Wallet.h"
 #include "wrapper/database/CHistoryDb.h"
+#include <set>
 
 namespace elastos {
 
@@ -34,6 +35,8 @@ public:
 
     long GetBalance(const std::string& address);
 
+    long GetBalance();
+
     int GetPosition();
 
     int SyncHistory();
@@ -41,6 +44,10 @@ public:
     int GetHistoryCount(const std::string& address);
 
     int GetHistory(const std::string& address, int pageSize, int page, bool ascending, std::string& histories);
+
+    std::vector<std::string> GetUsedAddresses();
+
+    std::vector<std::string> GetUnUsedAddresses(unsigned int count);
 
 private:
     int SingleAddressCreateTx(const std::vector<Transaction>& transactions,
@@ -68,6 +75,14 @@ private:
 
     int InsertSendingTx(const std::vector<Transaction>& transactions, const std::string& memo, const std::string& txid, const std::string& tx);
 
+    void Init();
+
+    void Init(int chain);
+
+    std::vector<std::string> GetUnUsedAddresses(unsigned int count, int chain);
+
+    int GetAddressIndex(const std::string& address, int* chain);
+
 private:
     std::string mPath;
     std::unique_ptr<BlockChainNode> mBlockChainNode;
@@ -76,7 +91,23 @@ private:
     bool mSingleAddress {false};
     std::unique_ptr<MasterPublicKey> mMasterPublicKey;
 
+    // addresses
+    std::vector<std::string> mInternalAddrs;
+    std::vector<std::string> mExternalAddrs;
+    std::set<std::string> mUsedAddrs;
+
     friend class Identity;
+
+private:
+    struct Address
+    {
+        Address(const std::string& addr, long balance)
+            : mAddress(addr)
+            , mBalance(balance)
+        {}
+        std::string mAddress;
+        long mBalance;
+    };
 };
 
 } // namespace elastos

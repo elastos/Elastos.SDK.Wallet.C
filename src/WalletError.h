@@ -9,6 +9,7 @@
 #define E_WALLET_C_NOT_IMPLEMENTED          -4
 #define E_WALLET_C_OUT_OF_RANGE             -5
 #define E_WALLET_C_OUT_OF_MEMORY            -6
+#define E_WALLET_C_BALANCE_NOT_ENOUGH       -7
 
 
 // error from service

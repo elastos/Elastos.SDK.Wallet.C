@@ -29,6 +29,8 @@ public:
     static int Str2Hex(const std::string& str, uint8_t** buf);
 
     static int ServiceErr2SdkErr(int error);
+
+    static long GetFee();
 };
 
 } // namespace elastos

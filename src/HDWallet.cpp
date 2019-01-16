@@ -5,11 +5,15 @@
 #include "WalletError.h"
 #include "nlohmann/json.hpp"
 #include "wrapper/httpclient/HttpClient.hpp"
+#include  <algorithm>
 
 
 #define CLASS_TEXT "HDWallet"
 #define HISTORY_PAGE_SIZE   10
 #define HTTP_TIME_OUT       10000
+
+#define ADDRESS_CHECK_INTERVAL  100
+
 
 namespace elastos {
 
@@ -33,6 +37,10 @@ HDWallet::HDWallet(const std::string& localPath, const std::string& seed, std::u
     }
 
     mMasterPublicKey.reset(masterPublicKey);
+
+    if (!mSingleAddress) {
+        Init();
+    }
 }
 
 HDWallet::HDWallet(const std::string& localPath, const std::string& seed, std::unique_ptr<BlockChainNode>& node, int coinType)
@@ -151,6 +159,17 @@ long HDWallet::GetBalance(const std::string& address)
     return balance;
 }
 
+long HDWallet::GetBalance()
+{
+    long total = 0;
+    std::vector<std::string> used = GetUsedAddresses();
+    for (std::string addr : used) {
+        total += GetBalance(addr);
+    }
+
+    return total;
+}
+
 int HDWallet::GetPosition()
 {
     return mPosition;
@@ -225,6 +244,18 @@ int HDWallet::GetHistory(const std::string& address, int pageSize, int page, boo
     return E_WALLET_C_OK;
 }
 
+std::vector<std::string> HDWallet::GetUsedAddresses()
+{
+    std::vector<std::string> used(mUsedAddrs.begin(), mUsedAddrs.end());
+    return used;
+}
+
+std::vector<std::string> HDWallet::GetUnUsedAddresses(unsigned int count)
+{
+    assert(count > 0);
+    return GetUnUsedAddresses(count, EXTERNAL_CHAIN);
+}
+
 int HDWallet::SingleAddressCreateTx(const std::vector<Transaction>& transactions,
         const std::string& memo, const std::string& seed, const std::string& chain, std::string& txJson)
 {
@@ -268,7 +299,80 @@ int HDWallet::SingleAddressCreateTx(const std::vector<Transaction>& transactions
 int HDWallet::HDCreateTx(const std::vector<Transaction>& transactions,
         const std::string& memo, const std::string& seed, const std::string& chain, std::string& txJson)
 {
-    return E_WALLET_C_NOT_IMPLEMENTED;
+    long amount = 0;
+    for (Transaction tx : transactions) {
+        amount += tx.GetAmount();
+    }
+
+    std::vector<Address> addresses;
+    for (std::string addr : mUsedAddrs) {
+        long balance = GetBalance(addr);
+        if (balance == 0) continue;
+        Address address(addr, balance);
+        addresses.push_back(address);
+    }
+
+    std::sort(addresses.begin(), addresses.end(),
+            [](const Address& a, const Address& b)
+            {
+                return a.mBalance <= b.mBalance;
+            });
+
+    long balance = 0;
+    long fee = Utils::GetFee();
+    std::vector<std::string> inputAddrs;
+    for (Address addr : addresses) {
+        balance += addr.mBalance;
+        inputAddrs.push_back(addr.mAddress);
+        if (balance >= amount + fee) break;
+    }
+
+    if (balance < amount + fee) return E_WALLET_C_BALANCE_NOT_ENOUGH;
+
+    std::vector<std::string> unused = GetUnUsedAddresses(1, INTERNAL_CHAIN);
+    Transaction tx(unused[0], balance - amount - fee, mCoinType);
+    std::vector<Transaction> finalTxes(transactions.begin(), transactions.end());
+    finalTxes.push_back(tx);
+
+    std::string json;
+    int ret = CreateTransaction(transactions, inputAddrs, chain, json);
+    if (ret != E_WALLET_C_OK) {
+        Log::E(CLASS_TEXT, "create transaction failed ret:%d\n", ret);
+        return ret;
+    }
+
+    nlohmann::json jRet = nlohmann::json::parse(json);
+    nlohmann::json jResult = jRet["result"];
+
+    uint8_t* seedBuf;
+    int seedLen = Utils::Str2Hex(seed, &seedBuf);
+    if (seedLen == 0) {
+        Log::E(CLASS_TEXT, "seed is empty\n");
+        return E_WALLET_C_INVALID_ARGUMENT;
+    }
+
+    std::vector<nlohmann::json> inputs = jResult["Transactions"][0]["UTXOInputs"];
+    for (int i = 0; i < inputs.size(); i++) {
+        int chain;
+        int index = GetAddressIndex(inputs[i]["address"], &chain);
+        char* privateKey = generateSubPrivateKey(seedBuf, seedLen, mCoinType, chain, index);
+
+        jResult["Transactions"][0]["UTXOInputs"][i]["privateKey"] = privateKey;
+
+
+        free(privateKey);
+    }
+    free(seedBuf);
+
+    if (!memo.empty()) {
+        jResult["Transactions"][0]["Memo"] = memo;
+    }
+
+    Log::D(CLASS_TEXT, "transaction: %s\n", jResult.dump().c_str());
+
+    txJson = jResult.dump();
+
+    return E_WALLET_C_OK;
 }
 
 int HDWallet::CreateTransaction(const std::vector<Transaction>& transactions,
@@ -551,6 +655,69 @@ int HDWallet::InsertSendingTx(const std::vector<Transaction>& transactions, cons
     CHistoryDb db(mPath, GetTableName());
 
     return db.Insert(historyVector);
+}
+
+void HDWallet::Init()
+{
+    Init(EXTERNAL_CHAIN);
+    Init(INTERNAL_CHAIN);
+}
+
+void HDWallet::Init(int chain)
+{
+    std::vector<std::string>& addrs = chain == EXTERNAL_CHAIN ? mExternalAddrs : mInternalAddrs;
+    int interval = ADDRESS_CHECK_INTERVAL;
+    for (int i = 0; i < interval; i++) {
+        std::string address = GetAddress(EXTERNAL_CHAIN, i);
+        addrs.push_back(address);
+        int count = GetHistoryCount(address);
+        if (count > 0) {
+            mUsedAddrs.insert(address);
+            interval++;
+        }
+    }
+}
+
+std::vector<std::string> HDWallet::GetUnUsedAddresses(unsigned int count, int chain)
+{
+    assert(count > 0);
+
+    std::vector<std::string>& addrs = chain == EXTERNAL_CHAIN ? mExternalAddrs : mInternalAddrs;
+    int gen = 0, used = 0;
+
+    std::vector<std::string> unusedAddrs;
+    for (std::string addr : addrs) {
+        if (!mUsedAddrs.count(addr)) continue;
+        unusedAddrs.push_back(addr);
+        if (unusedAddrs.size() == count) break;
+    }
+
+    int diff = count - unusedAddrs.size();
+    if (diff <= 0) return unusedAddrs;
+
+    int size = addrs.size();
+    for (int i = 0; i < diff; i++) {
+        std::string address = GetAddress(chain, i + size);
+        addrs.push_back(address);
+        unusedAddrs.push_back(address);
+    }
+
+    return unusedAddrs;
+}
+
+int HDWallet::GetAddressIndex(const std::string& address, int* chain)
+{
+    int dis = std::distance(mInternalAddrs.begin(),
+            find(mInternalAddrs.begin(), mInternalAddrs.end(), address));
+    if (dis < mInternalAddrs.size()) {
+        *chain = INTERNAL_CHAIN;
+        return dis;
+    }
+
+    dis =  std::distance(mExternalAddrs.begin(),
+            find(mExternalAddrs.begin(), mExternalAddrs.end(), address));
+    *chain = EXTERNAL_CHAIN;
+    return dis;
 }
 
 } // namespace elastos

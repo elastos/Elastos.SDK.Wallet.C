@@ -170,7 +170,7 @@ std::string Did::SignInfo(const std::string& seed, const uint8_t* message, int l
 {
     uint8_t* seedBuf;
     int seedLen = Utils::Str2Hex(seed, &seedBuf);
-    char* privateKey = generateSubPrivateKey(seedBuf, seedLen, COIN_TYPE_ELA, 0, mIndex);
+    char* privateKey = generateSubPrivateKey(seedBuf, seedLen, COIN_TYPE_ELA, EXTERNAL_CHAIN, mIndex);
     free(seedBuf);
 
     char* publicKey = getPublicKeyFromPrivateKey(privateKey);
