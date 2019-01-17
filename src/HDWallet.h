@@ -49,6 +49,8 @@ public:
 
     std::vector<std::string> GetUnUsedAddresses(unsigned int count);
 
+    int Recover();
+
 private:
     int SingleAddressCreateTx(const std::vector<Transaction>& transactions,
             const std::string& memo, const std::string& seed, const std::string& chain, std::string& txJson);
@@ -71,7 +73,7 @@ private:
 
     int SyncMultiHistory(int gap);
 
-    int SyncMultiHistory(int gap, int chain);
+    int SyncMultiHistory(int gap, int chain, bool generate = false);
 
     std::string GetTableName();
 

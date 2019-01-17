@@ -12,7 +12,7 @@
 #define HISTORY_PAGE_SIZE   10
 #define HTTP_TIME_OUT       10000
 
-#define ADDRESS_CHECK_INTERVAL  100
+#define ADDRESS_CHECK_INTERVAL  20
 
 
 namespace elastos {
@@ -258,6 +258,31 @@ std::vector<std::string> HDWallet::GetUnUsedAddresses(unsigned int count)
 {
     assert(count > 0);
     return GetUnUsedAddresses(count, EXTERNAL_CHAIN);
+}
+
+int HDWallet::Recover()
+{
+    if (mSingleAddress) {
+        return SyncHistory();
+    }
+
+    int ret = SyncMultiHistory(ADDRESS_CHECK_INTERVAL, INTERNAL_CHAIN, true);
+    if (ret != E_WALLET_C_OK) {
+        Log::E(CLASS_TEXT, "recover internal chain failed: %d\n", ret);
+        return ret;
+    }
+
+    ret = SyncMultiHistory(ADDRESS_CHECK_INTERVAL, EXTERNAL_CHAIN, true);
+    if (ret != E_WALLET_C_OK) {
+        Log::E(CLASS_TEXT, "recover external chain failed: %d\n", ret);
+        return ret;
+    }
+
+    Log::D(CLASS_TEXT, "internal chain size: %d\n", mInternalAddrs.size());
+    Log::D(CLASS_TEXT, "external chain size: %d\n", mExternalAddrs.size());
+    Log::D(CLASS_TEXT, "used addr size: %d\n", mUsedAddrs.size());
+
+    return ret;
 }
 
 int HDWallet::SingleAddressCreateTx(const std::vector<Transaction>& transactions,
@@ -609,24 +634,31 @@ int HDWallet::SyncMultiHistory(int gap)
     return SyncMultiHistory(gap, EXTERNAL_CHAIN);
 }
 
-int HDWallet::SyncMultiHistory(int gap, int chain)
+int HDWallet::SyncMultiHistory(int gap, int chain, bool generate)
 {
     int ret;
-    int count = 0;
+    int count = 0, start = 0;
     std::vector<std::string>& addrs = chain == EXTERNAL_CHAIN ? mExternalAddrs : mInternalAddrs;
-    for (std::string addr : addrs) {
+
+check:
+    for (int i = start; i < addrs.size(); i++) {
         bool hasHistory = false;
-        ret = SyncHistory(addr, &hasHistory);
+        ret = SyncHistory(addrs[i], &hasHistory);
         if (ret != E_WALLET_C_OK) return ret;
 
         if (hasHistory) {
             // set address used.
-            mUsedAddrs.insert(addr);
+            mUsedAddrs.insert(addrs[i]);
+            count = 0;
         }
         else if (++count >= gap) break;
     }
 
-    return E_WALLET_C_OK;
+    if (!generate || count >= gap) return E_WALLET_C_OK;
+
+    GetUnUsedAddresses(gap - count, chain);
+    start = addrs.size();
+    goto check;
 }
 
 std::string HDWallet::GetTableName()

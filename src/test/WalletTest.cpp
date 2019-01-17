@@ -168,7 +168,8 @@ void TestHDWallet()
     index = identity->CreateWallet(seed, COIN_TYPE_ELA, node1, &hdWallet);
     printf("hd wallet index:%d\n", index);
 
-    hdWallet->SyncHistory();
+    // hdWallet->SyncHistory();
+    hdWallet->Recover();
 
     int balance = hdWallet->GetBalance();
     printf("balance: %d\n", balance);
