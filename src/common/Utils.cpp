@@ -65,7 +65,7 @@ int Utils::ServiceErr2SdkErr(int error)
 
 long Utils::GetFee()
 {
-    return 100;
+    return 4860;
 }
 
 } // namespace elastos

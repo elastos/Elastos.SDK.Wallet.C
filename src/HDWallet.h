@@ -65,11 +65,13 @@ private:
 
     void SetPosition(int pos);
 
-    int SyncHistory(const std::string& address);
+    int SyncHistory(const std::string& address, bool* hasHistory = nullptr);
 
     int GetHistoryAndSave(const std::string& address, int page, CHistoryDb& db, int* total = nullptr);
 
-    int SyncMultiHistory();
+    int SyncMultiHistory(int gap);
+
+    int SyncMultiHistory(int gap, int chain);
 
     std::string GetTableName();
 

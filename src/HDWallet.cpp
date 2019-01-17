@@ -45,11 +45,15 @@ HDWallet::HDWallet(const std::string& localPath, const std::string& seed, std::u
 
 HDWallet::HDWallet(const std::string& localPath, const std::string& seed, std::unique_ptr<BlockChainNode>& node, int coinType)
     : HDWallet(localPath, seed, node, coinType, false)
-{}
+{
+    printf("HDWallet constructor not single address\n");
+}
 
 HDWallet::HDWallet(const std::string& localPath, const std::string& seed, std::unique_ptr<BlockChainNode>& node, bool singleAddress)
     : HDWallet(localPath, seed, node, COIN_TYPE_ELA, singleAddress)
-{}
+{
+    printf("HDWallet constructor single address\n");
+}
 
 HDWallet::HDWallet(const std::string& localPath, const std::string& seed, std::unique_ptr<BlockChainNode>& node)
     : HDWallet(localPath, seed, node, COIN_TYPE_ELA, false)
@@ -120,7 +124,7 @@ std::string HDWallet::GetAddress(int chain, int index)
 std::string HDWallet::GetPublicKey(int chain, int index)
 {
     assert(mMasterPublicKey && chain >= 0 && index >= 0);
-    int param1 = mSingleAddress ? 0 : chain;
+    int param1 = mSingleAddress ? EXTERNAL_CHAIN : chain;
     int param2 = mSingleAddress ? 0 : index;
     char* publicKey = generateSubPublicKey(mMasterPublicKey.get(), param1, param2);
     std::string ret = publicKey;
@@ -178,10 +182,10 @@ int HDWallet::GetPosition()
 int HDWallet::SyncHistory()
 {
     if (mSingleAddress) {
-        return SyncHistory(GetAddress(0, 0));
+        return SyncHistory(GetAddress(EXTERNAL_CHAIN, 0));
     }
     else {
-        return SyncMultiHistory();
+        return SyncMultiHistory(5);
     }
 }
 
@@ -260,7 +264,7 @@ int HDWallet::SingleAddressCreateTx(const std::vector<Transaction>& transactions
         const std::string& memo, const std::string& seed, const std::string& chain, std::string& txJson)
 {
     std::vector<std::string> addresses;
-    std::string address = GetAddress(0, 0);
+    std::string address = GetAddress(EXTERNAL_CHAIN, 0);
     addresses.push_back(address);
 
     std::string json;
@@ -330,12 +334,13 @@ int HDWallet::HDCreateTx(const std::vector<Transaction>& transactions,
     if (balance < amount + fee) return E_WALLET_C_BALANCE_NOT_ENOUGH;
 
     std::vector<std::string> unused = GetUnUsedAddresses(1, INTERNAL_CHAIN);
+    printf("unused address: %s\n", unused[0].c_str());
     Transaction tx(unused[0], balance - amount - fee, mCoinType);
     std::vector<Transaction> finalTxes(transactions.begin(), transactions.end());
     finalTxes.push_back(tx);
 
     std::string json;
-    int ret = CreateTransaction(transactions, inputAddrs, chain, json);
+    int ret = CreateTransaction(finalTxes, inputAddrs, chain, json);
     if (ret != E_WALLET_C_OK) {
         Log::E(CLASS_TEXT, "create transaction failed ret:%d\n", ret);
         return ret;
@@ -356,10 +361,7 @@ int HDWallet::HDCreateTx(const std::vector<Transaction>& transactions,
         int chain;
         int index = GetAddressIndex(inputs[i]["address"], &chain);
         char* privateKey = generateSubPrivateKey(seedBuf, seedLen, mCoinType, chain, index);
-
         jResult["Transactions"][0]["UTXOInputs"][i]["privateKey"] = privateKey;
-
-
         free(privateKey);
     }
     free(seedBuf);
@@ -462,7 +464,7 @@ void HDWallet::SetPosition(int pos)
     mPosition = pos;
 }
 
-int HDWallet::SyncHistory(const std::string& address)
+int HDWallet::SyncHistory(const std::string& address, bool* hasHistory)
 {
     CHistoryDb db(mPath, GetTableName());
     int count = 0;
@@ -479,6 +481,10 @@ int HDWallet::SyncHistory(const std::string& address)
     if (ret < 0) {
         Log::E(CLASS_TEXT, "get history and save failed ret:%d\n", ret);
         return ret;
+    }
+
+    if ((count > 0 || total > 0) && hasHistory) {
+        *hasHistory = true;
     }
 
     if (ret == 0 || total <= pageNum * HISTORY_PAGE_SIZE) {
@@ -595,9 +601,32 @@ int HDWallet::GetHistoryAndSave(const std::string& address, int page, CHistoryDb
     }
 }
 
-int HDWallet::SyncMultiHistory()
+int HDWallet::SyncMultiHistory(int gap)
 {
-    return E_WALLET_C_NOT_IMPLEMENTED;
+    int ret = SyncMultiHistory(gap, INTERNAL_CHAIN);
+    if (ret != E_WALLET_C_OK) return ret;
+
+    return SyncMultiHistory(gap, EXTERNAL_CHAIN);
+}
+
+int HDWallet::SyncMultiHistory(int gap, int chain)
+{
+    int ret;
+    int count = 0;
+    std::vector<std::string>& addrs = chain == EXTERNAL_CHAIN ? mExternalAddrs : mInternalAddrs;
+    for (std::string addr : addrs) {
+        bool hasHistory = false;
+        ret = SyncHistory(addr, &hasHistory);
+        if (ret != E_WALLET_C_OK) return ret;
+
+        if (hasHistory) {
+            // set address used.
+            mUsedAddrs.insert(addr);
+        }
+        else if (++count >= gap) break;
+    }
+
+    return E_WALLET_C_OK;
 }
 
 std::string HDWallet::GetTableName()
@@ -611,22 +640,10 @@ std::string HDWallet::GetTableName()
 
 int HDWallet::InsertSendingTx(const std::vector<Transaction>& transactions, const std::string& memo, const std::string& txid, const std::string& tx)
 {
-    if (!mSingleAddress) {
-        return E_WALLET_C_NOT_IMPLEMENTED;
-    }
-
     long amount = 0l;
     for (Transaction transaction : transactions) {
         amount += transaction.GetAmount();
     }
-
-    History history;
-    history.mTxid = txid;
-    history.mAddress = GetAddress(0, 0);
-    history.mDirection = "spending";
-    history.mAmount = amount;
-    history.mTime = time(0);
-    history.mHeight = 0;
 
     nlohmann::json jTx = nlohmann::json::parse(tx);
     std::vector<nlohmann::json> inputsVector = jTx["Transactions"][0]["UTXOInputs"];
@@ -637,23 +654,34 @@ int HDWallet::InsertSendingTx(const std::vector<Transaction>& transactions, cons
             inputs.append(";");
         }
     }
-    history.mInputs = inputs;
-
     std::vector<nlohmann::json> outputsVector = jTx["Transactions"][0]["Outputs"];
     std::string outputs;
     for (int i = 0; i < outputsVector.size(); i++) {
+        if (outputsVector[i]["amount"] == 0) continue;
         outputs.append(outputsVector[i]["address"].get<std::string>());
         if (i != outputsVector.size() - 1) {
             outputs.append(";");
         }
     }
-    history.mOutputs = outputs;
-    history.mMemo = memo;
 
     std::vector<History> historyVector;
-    historyVector.push_back(history);
-    CHistoryDb db(mPath, GetTableName());
+    for (nlohmann::json input : inputsVector) {
+        History history;
+        history.mTxid = txid;
+        history.mAddress = input["address"];
+        history.mDirection = "spending";
+        history.mAmount = mSingleAddress ? amount : GetBalance(history.mAddress);
+        history.mTime = time(0);
+        history.mHeight = 0;
 
+        history.mInputs = inputs;
+        history.mOutputs = outputs;
+        history.mMemo = memo;
+
+        historyVector.push_back(history);
+    }
+
+    CHistoryDb db(mPath, GetTableName());
     return db.Insert(historyVector);
 }
 
@@ -668,7 +696,7 @@ void HDWallet::Init(int chain)
     std::vector<std::string>& addrs = chain == EXTERNAL_CHAIN ? mExternalAddrs : mInternalAddrs;
     int interval = ADDRESS_CHECK_INTERVAL;
     for (int i = 0; i < interval; i++) {
-        std::string address = GetAddress(EXTERNAL_CHAIN, i);
+        std::string address = GetAddress(chain, i);
         addrs.push_back(address);
         int count = GetHistoryCount(address);
         if (count > 0) {
@@ -687,7 +715,7 @@ std::vector<std::string> HDWallet::GetUnUsedAddresses(unsigned int count, int ch
 
     std::vector<std::string> unusedAddrs;
     for (std::string addr : addrs) {
-        if (!mUsedAddrs.count(addr)) continue;
+        if (mUsedAddrs.count(addr)) continue;
         unusedAddrs.push_back(addr);
         if (unusedAddrs.size() == count) break;
     }
