@@ -9,6 +9,7 @@
 #include "Wallet.h"
 #include "wrapper/database/CHistoryDb.h"
 #include <set>
+#include<pthread.h>
 
 namespace elastos {
 
@@ -23,6 +24,8 @@ public:
     HDWallet(const std::string& localPath, const std::string& seed, std::unique_ptr<BlockChainNode>& node, bool singleAddress);
 
     HDWallet(const std::string& localPath, const std::string& seed, std::unique_ptr<BlockChainNode>& node);
+
+    ~HDWallet();
 
     int GetCoinType();
 
@@ -99,6 +102,9 @@ private:
     std::vector<std::string> mInternalAddrs;
     std::vector<std::string> mExternalAddrs;
     std::set<std::string> mUsedAddrs;
+
+    // mutex
+    pthread_mutex_t mAddrLock;
 
     friend class Identity;
 

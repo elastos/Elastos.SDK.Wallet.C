@@ -23,6 +23,13 @@ HDWallet::HDWallet(const std::string& localPath, const std::string& seed, std::u
     , mCoinType(coinType)
     , mSingleAddress(singleAddress)
 {
+    // mutex init
+    pthread_mutexattr_t recursiveAttr;
+    pthread_mutexattr_init(&recursiveAttr);
+    pthread_mutexattr_settype(&recursiveAttr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(&mAddrLock, &recursiveAttr);
+    pthread_mutexattr_destroy(&recursiveAttr);
+
     uint8_t* seedBuf;
     int seedLen = Utils::Str2Hex(seed, &seedBuf);
     if (seedLen == 0) {
@@ -45,19 +52,20 @@ HDWallet::HDWallet(const std::string& localPath, const std::string& seed, std::u
 
 HDWallet::HDWallet(const std::string& localPath, const std::string& seed, std::unique_ptr<BlockChainNode>& node, int coinType)
     : HDWallet(localPath, seed, node, coinType, false)
-{
-    printf("HDWallet constructor not single address\n");
-}
+{}
 
 HDWallet::HDWallet(const std::string& localPath, const std::string& seed, std::unique_ptr<BlockChainNode>& node, bool singleAddress)
     : HDWallet(localPath, seed, node, COIN_TYPE_ELA, singleAddress)
-{
-    printf("HDWallet constructor single address\n");
-}
+{}
 
 HDWallet::HDWallet(const std::string& localPath, const std::string& seed, std::unique_ptr<BlockChainNode>& node)
     : HDWallet(localPath, seed, node, COIN_TYPE_ELA, false)
 {}
+
+HDWallet::~HDWallet()
+{
+    pthread_mutex_destroy(&mAddrLock);
+}
 
 int HDWallet::GetCoinType()
 {
@@ -725,6 +733,7 @@ void HDWallet::Init()
 
 void HDWallet::Init(int chain)
 {
+    pthread_mutex_lock(&mAddrLock);
     std::vector<std::string>& addrs = chain == EXTERNAL_CHAIN ? mExternalAddrs : mInternalAddrs;
     int interval = ADDRESS_CHECK_INTERVAL;
     for (int i = 0; i < interval; i++) {
@@ -736,12 +745,14 @@ void HDWallet::Init(int chain)
             interval++;
         }
     }
+    pthread_mutex_unlock(&mAddrLock);
 }
 
 std::vector<std::string> HDWallet::GetUnUsedAddresses(unsigned int count, int chain)
 {
     assert(count > 0);
 
+    pthread_mutex_lock(&mAddrLock);
     std::vector<std::string>& addrs = chain == EXTERNAL_CHAIN ? mExternalAddrs : mInternalAddrs;
     int gen = 0, used = 0;
 
@@ -753,7 +764,10 @@ std::vector<std::string> HDWallet::GetUnUsedAddresses(unsigned int count, int ch
     }
 
     int diff = count - unusedAddrs.size();
-    if (diff <= 0) return unusedAddrs;
+    if (diff <= 0) {
+        pthread_mutex_unlock(&mAddrLock);
+        return unusedAddrs;
+    }
 
     int size = addrs.size();
     for (int i = 0; i < diff; i++) {
@@ -761,6 +775,7 @@ std::vector<std::string> HDWallet::GetUnUsedAddresses(unsigned int count, int ch
         addrs.push_back(address);
         unusedAddrs.push_back(address);
     }
+    pthread_mutex_unlock(&mAddrLock);
 
     return unusedAddrs;
 }
