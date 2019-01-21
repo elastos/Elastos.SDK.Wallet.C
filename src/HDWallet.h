@@ -6,14 +6,13 @@
 #include "Elastos.Wallet.Utility.h"
 #include "BlockChainNode.h"
 #include "Transaction.h"
-#include "Wallet.h"
 #include "wrapper/database/CHistoryDb.h"
 #include <set>
 #include<pthread.h>
 
 namespace elastos {
 
-class HDWallet : public Wallet
+class HDWallet
 {
 public:
 
@@ -39,8 +38,6 @@ public:
     long GetBalance(const std::string& address);
 
     long GetBalance();
-
-    int GetPosition();
 
     int SyncHistory();
 
@@ -68,8 +65,6 @@ private:
 
     int HttpPost(const std::string& api, const std::string& body, std::string& result);
 
-    void SetPosition(int pos);
-
     int SyncHistory(const std::string& address, bool* hasHistory = nullptr);
 
     int GetHistoryAndSave(const std::string& address, int page, CHistoryDb& db, int* total = nullptr);
@@ -93,7 +88,6 @@ private:
 private:
     std::string mPath;
     std::unique_ptr<BlockChainNode> mBlockChainNode;
-    int mPosition = 0;
     int mCoinType = COIN_TYPE_ELA;
     bool mSingleAddress {false};
     std::unique_ptr<MasterPublicKey> mMasterPublicKey;
@@ -105,8 +99,6 @@ private:
 
     // mutex
     pthread_mutex_t mAddrLock;
-
-    friend class Identity;
 
 private:
     struct Address

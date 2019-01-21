@@ -161,11 +161,6 @@ std::string Did::GetInfo(const std::string& key)
     return jpro.dump();
 }
 
-int Did::GetPosition()
-{
-    return mPosition;
-}
-
 std::string Did::SignInfo(const std::string& seed, const uint8_t* message, int len)
 {
     uint8_t* seedBuf;
@@ -224,11 +219,6 @@ int Did::GenDidUploadInfo(const std::string& json, uint8_t** buf)
 
     *buf = binary;
     return len;
-}
-
-void Did::SetPosition(int pos)
-{
-    mPosition = pos;
 }
 
 }

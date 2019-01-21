@@ -25,23 +25,17 @@ public:
 
     std::string GetInfo(const std::string& key);
 
-    int GetPosition();
-
 private:
     int GenDidUploadInfo(const std::string& json, uint8_t** buf);
 
     std::string SignInfo(const std::string& seed, const uint8_t* message, int len);
-
-    void SetPosition(int pos);
 
 private:
     std::string mPublicKey;
     std::string mDid;
     std::string mPath;
     int mIndex = 0;
-    int mPosition = 0;
 
-    friend class DidManager;
 };
 
 }

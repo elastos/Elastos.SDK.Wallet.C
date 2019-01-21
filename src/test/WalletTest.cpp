@@ -61,14 +61,14 @@ void TestSingleWallet()
     printf("seed:%s\n", seed.c_str());
 
     std::shared_ptr<Identity> identity;
-    int index = IdentityManager::CreateIdentity("/Users/nathansfile/Elastos.SDK.Wallet.C", &identity);
-    printf("identity index:%d\n", index);
+    ret = IdentityManager::CreateIdentity("/Users/nathansfile/Elastos.SDK.Wallet.C", &identity);
+    printf("identity ret:%d\n", ret);
 
 
     std::unique_ptr<BlockChainNode> node1 = std::make_unique<BlockChainNode>(TEST_NET_WALLET_SERVICE_URL);
     std::shared_ptr<HDWallet> hdWallet;
-    index = identity->CreateSingleAddressWallet(seed, node1, &hdWallet);
-    printf("hd wallet index:%d\n", index);
+    ret = identity->CreateSingleAddressWallet(seed, node1, &hdWallet);
+    printf("hd wallet ret:%d\n", ret);
 
     std::string publicKey = hdWallet->GetPublicKey(0, 0);
     std::string hdSingleAddress = hdWallet->GetAddress(0, 0);
@@ -81,7 +81,7 @@ void TestSingleWallet()
 
     // std::unique_ptr<BlockChainNode> node = std::make_unique<BlockChainNode>(TEST_NET_DID_SERVICE_URL);
     // std::shared_ptr<HDWallet> idChainWallet;
-    // index = identity->CreateSingleAddressWallet(seed, node, &idChainWallet);
+    // ret = identity->CreateSingleAddressWallet(seed, node, &idChainWallet);
 
     // balance = idChainWallet->GetBalance(hdSingleAddress);
     // printf("id chain balance: %ld\n", balance);
@@ -127,7 +127,7 @@ void TestSingleWallet()
     }
 
     std::shared_ptr<Did> didObj;
-    index = manager->CreateDid(0, &didObj);
+    ret = manager->CreateDid(0, &didObj);
     std::string did = didObj->GetId();
     printf("did: %s\n", did.c_str());
 
@@ -160,13 +160,13 @@ void TestHDWallet()
     printf("seed:%s\n", seed.c_str());
 
     std::shared_ptr<Identity> identity;
-    int index = IdentityManager::CreateIdentity("/Users/nathansfile/Elastos.SDK.Wallet.C", &identity);
-    printf("identity index:%d\n", index);
+    ret = IdentityManager::CreateIdentity("/Users/nathansfile/Elastos.SDK.Wallet.C", &identity);
+    printf("identity ret:%d\n", ret);
 
     std::unique_ptr<BlockChainNode> node1 = std::make_unique<BlockChainNode>(TEST_NET_WALLET_SERVICE_URL);
     std::shared_ptr<HDWallet> hdWallet;
-    index = identity->CreateWallet(seed, COIN_TYPE_ELA, node1, &hdWallet);
-    printf("hd wallet index:%d\n", index);
+    ret = identity->CreateWallet(seed, COIN_TYPE_ELA, node1, &hdWallet);
+    printf("hd wallet ret:%d\n", ret);
 
     // hdWallet->SyncHistory();
     hdWallet->Recover();

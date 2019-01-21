@@ -36,31 +36,8 @@ int DidManager::CreateDid(int index, std::shared_ptr<Did>* did)
     char* publicKey = generateSubPublicKey(mMasterPublicKey.get(), 0, index);
     std::shared_ptr<Did> temp = std::make_shared<Did>(publicKey, index, mLocalPath);
     free(publicKey);
-    mDids.push_back(temp);
-    int pos = mDids.size() - 1;
-    temp->SetPosition(pos);
+
     *did = temp;
-
-    return pos;
-}
-
-std::shared_ptr<Did> DidManager::GetByPosition(int pos)
-{
-    if (pos < 0 || pos >= mDids.size()) {
-        return nullptr;
-    }
-    return mDids.at(pos);
-}
-
-int DidManager::DestroyDid(int pos)
-{
-    if (pos < 0 || pos >= mDids.size()) {
-        return E_WALLET_C_OUT_OF_RANGE;
-    }
-
-    std::shared_ptr<Did> did = mDids.at(pos);
-    did.reset();
-    mDids[pos] = nullptr;
 
     return E_WALLET_C_OK;
 }

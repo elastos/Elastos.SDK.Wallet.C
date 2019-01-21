@@ -182,11 +182,6 @@ long HDWallet::GetBalance()
     return total;
 }
 
-int HDWallet::GetPosition()
-{
-    return mPosition;
-}
-
 int HDWallet::SyncHistory()
 {
     if (mSingleAddress) {
@@ -489,12 +484,6 @@ int HDWallet::HttpPost(const std::string& api, const std::string& body, std::str
     Log::D(CLASS_TEXT, "response: %s\n", result.c_str());
     if (ret > 0) return 0;
     else return ret;
-}
-
-void HDWallet::SetPosition(int pos)
-{
-    assert(pos >= 0);
-    mPosition = pos;
 }
 
 int HDWallet::SyncHistory(const std::string& address, bool* hasHistory)

@@ -15,14 +15,10 @@ public:
 
     int CreateDid(int index, std::shared_ptr<Did>* did);
 
-    std::shared_ptr<Did> GetByPosition(int pos);
-
-    int DestroyDid(int pos);
-
 private:
     std::string mLocalPath;
     std::unique_ptr<MasterPublicKey> mMasterPublicKey;
-    std::vector<std::shared_ptr<Did>> mDids;
+
 };
 
 }

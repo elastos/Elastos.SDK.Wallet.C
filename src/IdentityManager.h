@@ -20,13 +20,6 @@ public:
     static std::string GetSeed(const std::string& mnemonic, const std::string& lanaguage, const std::string& words, const std::string& mnmonicPassword);
 
     static int CreateIdentity(const std::string& localPath, std::shared_ptr<Identity>* identity);
-
-    static int DestroyIdentity(int pos);
-
-    static std::shared_ptr<Identity> GetByPosition(int pos);
-
-public:
-    static std::vector<std::shared_ptr<Identity>> sIdentities;
 };
 
 }
