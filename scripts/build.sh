@@ -18,7 +18,7 @@ build_extfunc_depends()
 	"$DEPENDS_DIR/build-sqlite.sh" $@;
 
 	#CFG_BUILD_ROOT
-	"$DEPENDS_DIR/build-Elastos.ORG.Wallet.Lib.C.sh" $@;
+	"$DEPENDS_DIR/build-Elastos.SDK.Keypair.C.sh" $@;
 	
 }
 export CFG_PROJECT_DIR="$PROJECT_DIR";

@@ -50,7 +50,7 @@ void TestSingleWallet()
 {
     int ret;
     const char* mnemonic = "血 坝 告 售 代 讨 转 枝 欧 旦 诚 抱";
-    const char* path = "/Users/nathansfile/Elastos.ORG.Wallet.Lib.C/src/Data/mnemonic_chinese.txt";
+    const char* path = "/Users/nathansfile/Elastos.SDK.Keypair.C/src/Data/mnemonic_chinese.txt";
     char* words = readMnemonicFile(path);
     if (!words) {
         printf("read file failed\n");
@@ -149,7 +149,7 @@ void TestHDWallet()
 {
     int ret;
     const char* mnemonic = "血 坝 告 售 代 讨 转 枝 欧 旦 诚 抱";
-    const char* path = "/Users/nathansfile/Elastos.ORG.Wallet.Lib.C/src/Data/mnemonic_chinese.txt";
+    const char* path = "/Users/nathansfile/Elastos.SDK.Keypair.C/src/Data/mnemonic_chinese.txt";
     char* words = readMnemonicFile(path);
     if (!words) {
         printf("read file failed\n");
