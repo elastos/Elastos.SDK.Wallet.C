@@ -21,7 +21,7 @@ build_extfunc_depends()
 	
 }
 
-export CFG_PROJECT_NAME="Elastos.SDK.Wallet";
+export CFG_PROJECT_NAME="Elastos.SDK.Wallet.C";
 export CFG_PROJECT_DIR="$PROJECT_DIR";
 source "$DEPENDS_DIR/scripts/build.sh" $@;
 
