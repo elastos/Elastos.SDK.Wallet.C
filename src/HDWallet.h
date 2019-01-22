@@ -3,7 +3,6 @@
 #define __HD_WALLET_H__
 
 #include <string>
-#include "Elastos.Wallet.Utility.h"
 #include "BlockChainNode.h"
 #include "Transaction.h"
 #include "wrapper/database/CHistoryDb.h"

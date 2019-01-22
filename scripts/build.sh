@@ -20,6 +20,8 @@ build_extfunc_depends()
 	"$DEPENDS_DIR/scripts/build-Elastos.SDK.Keypair.C.sh" $@;
 	
 }
+
+export CFG_PROJECT_NAME="Elastos.SDK.Wallet";
 export CFG_PROJECT_DIR="$PROJECT_DIR";
 source "$DEPENDS_DIR/scripts/build.sh" $@;
 
