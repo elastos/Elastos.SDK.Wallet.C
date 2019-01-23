@@ -2,11 +2,15 @@
 #ifndef __MULTISIGN_WALLET_H__
 #define __MULTISIGN_WALLET_H__
 
+#include <Transaction.h>
+
+namespace elastos {
+
 class MultiSignWallet
 {
 public:
     MultiSignWallet(const std::vector<std::string>& publicKeys,
-            const std::string& privateKey, int requireCount, const BlockChainNode& node, int coinType = CoinType_ELA);
+            const std::string& privateKey, int requireCount, const BlockChainNode& node, int coinType = COIN_TYPE_ELA);
 
     int GetCoinType();
 
@@ -26,5 +30,7 @@ public:
     int SendTransaction(const std::string& json);
 
 };
+
+} //namespace elastos
 
 #endif // __MULTISIGN_WALLET_H__

@@ -1,8 +1,10 @@
 
-#include "DidManager.h"
+#include "Elastos.Wallet.Utility.h"
 #include "common/Utils.h"
 #include "common/Log.hpp"
 #include "WalletError.h"
+
+#include "DidManager.h"
 
 namespace elastos{
 

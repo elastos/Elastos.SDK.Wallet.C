@@ -3,7 +3,10 @@
 #define __TRANSACTION_H__
 
 #include <string>
-#include "Elastos.Wallet.Utility.h"
+
+extern "C" {
+extern const int COIN_TYPE_ELA;
+}
 
 namespace elastos {
 

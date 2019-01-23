@@ -1,4 +1,3 @@
-#include "Did.h"
 #include "Elastos.Wallet.Utility.h"
 #include "common/Utils.h"
 #include "common/Log.hpp"
@@ -8,6 +7,8 @@
 #include "wrapper/httpclient/HttpClient.hpp"
 #include "wrapper/database/CDidDb.h"
 #include "wrapper/database/SqliteWrapperError.h"
+
+#include "Did.h"
 
 namespace elastos {
 

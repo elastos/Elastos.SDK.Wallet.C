@@ -1,7 +1,9 @@
-
-#include "Identity.h"
+#include "Elastos.Wallet.Utility.h"
 #include "common/Utils.h"
 #include "WalletError.h"
+#include "wrapper/httpclient/HttpClient.hpp"
+
+#include "Identity.h"
 
 namespace elastos {
 

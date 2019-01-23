@@ -1,4 +1,5 @@
 
+#include "Elastos.Wallet.Utility.h"
 #include "Transaction.h"
 
 namespace elastos {

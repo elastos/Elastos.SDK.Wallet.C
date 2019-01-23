@@ -1,12 +1,14 @@
 
-#include "HDWallet.h"
+#include "Elastos.Wallet.Utility.h"
 #include "common/Log.hpp"
 #include "common/Utils.h"
 #include "WalletError.h"
 #include "nlohmann/json.hpp"
+#include "wrapper/database/CHistoryDb.h"
 #include "wrapper/httpclient/HttpClient.hpp"
 #include  <algorithm>
 
+#include "HDWallet.h"
 
 #define CLASS_TEXT "HDWallet"
 #define HISTORY_PAGE_SIZE   10

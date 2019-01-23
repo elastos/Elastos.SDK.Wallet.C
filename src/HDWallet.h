@@ -2,14 +2,21 @@
 #ifndef __HD_WALLET_H__
 #define __HD_WALLET_H__
 
-#include <string>
-#include "BlockChainNode.h"
-#include "Transaction.h"
-#include "wrapper/database/CHistoryDb.h"
+#include <BlockChainNode.h>
+#include <Transaction.h>
+#include <pthread.h>
 #include <set>
-#include<pthread.h>
+#include <string>
+#include <vector>
+
+extern "C" {
+extern const int COIN_TYPE_ELA;
+struct MasterPublicKey;
+}
 
 namespace elastos {
+
+class CHistoryDb;
 
 class HDWallet
 {

@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 #include "Did.h"
-#include "Elastos.Wallet.Utility.h"
 
 namespace elastos{
 
