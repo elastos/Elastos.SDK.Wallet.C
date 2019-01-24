@@ -6,6 +6,7 @@
 #include <sstream>
 #include <sqlite3.h>
 #include "CDbHelper.h"
+#include <string.h>
 
 namespace elastos {
 

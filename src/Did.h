@@ -3,6 +3,7 @@
 #define __DID_H__
 
 #include <string>
+#include <memory>
 #include "HDWallet.h"
 
 namespace elastos {

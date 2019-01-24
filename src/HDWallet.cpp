@@ -19,9 +19,9 @@
 
 namespace elastos {
 
-HDWallet::HDWallet(const std::string& localPath, const std::string& seed, std::unique_ptr<BlockChainNode>& node, int coinType, bool singleAddress)
+HDWallet::HDWallet(const std::string& localPath, const std::string& seed, const std::shared_ptr<BlockChainNode>& node, int coinType, bool singleAddress)
     : mPath(localPath)
-    , mBlockChainNode(std::move(node))
+    , mBlockChainNode(node)
     , mCoinType(coinType)
     , mSingleAddress(singleAddress)
 {
@@ -52,15 +52,15 @@ HDWallet::HDWallet(const std::string& localPath, const std::string& seed, std::u
     }
 }
 
-HDWallet::HDWallet(const std::string& localPath, const std::string& seed, std::unique_ptr<BlockChainNode>& node, int coinType)
+HDWallet::HDWallet(const std::string& localPath, const std::string& seed, const std::shared_ptr<BlockChainNode>& node, int coinType)
     : HDWallet(localPath, seed, node, coinType, false)
 {}
 
-HDWallet::HDWallet(const std::string& localPath, const std::string& seed, std::unique_ptr<BlockChainNode>& node, bool singleAddress)
+HDWallet::HDWallet(const std::string& localPath, const std::string& seed, const std::shared_ptr<BlockChainNode>& node, bool singleAddress)
     : HDWallet(localPath, seed, node, COIN_TYPE_ELA, singleAddress)
 {}
 
-HDWallet::HDWallet(const std::string& localPath, const std::string& seed, std::unique_ptr<BlockChainNode>& node)
+HDWallet::HDWallet(const std::string& localPath, const std::string& seed, const std::shared_ptr<BlockChainNode>& node)
     : HDWallet(localPath, seed, node, COIN_TYPE_ELA, false)
 {}
 

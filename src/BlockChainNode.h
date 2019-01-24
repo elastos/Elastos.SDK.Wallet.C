@@ -4,6 +4,14 @@
 
 #include <string>
 
+namespace elastos{
+
+#define TEST_NET_WALLET_SERVICE_URL         "https://api-wallet-ela-testnet.elastos.org"
+#define WALLET_SERVICE_URL                  "https://api-wallet-ela.elastos.org"
+
+#define TEST_NET_DID_SERVICE_URL            "https://api-wallet-did-testnet.elastos.org"
+#define DID_SERVICE_URL                     "https://api-wallet-did.elastos.org"
+
 class BlockChainNode
 {
 public:
@@ -18,13 +26,11 @@ public:
 
     void SetCertificate(const std::string& cert);
 
-    std::string ToJson();
-
-    void FromJson(const std::string& json);
-
 private:
     std::string mUrl;
     std::string mCert;
 };
+
+} // namespace elastos
 
 #endif //__BLOCK_CHAIN_NODE_H__

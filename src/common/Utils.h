@@ -8,12 +8,6 @@ namespace elastos {
 
 #define TEST_NET    true
 
-#define TEST_NET_WALLET_SERVICE_URL         "https://api-wallet-ela-testnet.elastos.org"
-#define WALLET_SERVICE_URL                  "https://api-wallet-ela.elastos.org"
-
-#define TEST_NET_DID_SERVICE_URL            "https://api-wallet-did-testnet.elastos.org"
-#define DID_SERVICE_URL                     "https://api-wallet-did.elastos.org"
-
 #define TEST_DB_FILE    "ElastosWalletTest.db"
 #define DB_FILE         "ElastosWallet.db"
 

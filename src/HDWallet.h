@@ -8,6 +8,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <memory>
 
 extern "C" {
 extern const int COIN_TYPE_ELA;
@@ -22,13 +23,13 @@ class HDWallet
 {
 public:
 
-    HDWallet(const std::string& localPath, const std::string& seed, std::unique_ptr<BlockChainNode>& node, int coinType, bool singleAddress);
+    HDWallet(const std::string& localPath, const std::string& seed, const std::shared_ptr<BlockChainNode>& node, int coinType, bool singleAddress);
 
-    HDWallet(const std::string& localPath, const std::string& seed, std::unique_ptr<BlockChainNode>& node, int coinType);
+    HDWallet(const std::string& localPath, const std::string& seed, const std::shared_ptr<BlockChainNode>& node, int coinType);
 
-    HDWallet(const std::string& localPath, const std::string& seed, std::unique_ptr<BlockChainNode>& node, bool singleAddress);
+    HDWallet(const std::string& localPath, const std::string& seed, const std::shared_ptr<BlockChainNode>& node, bool singleAddress);
 
-    HDWallet(const std::string& localPath, const std::string& seed, std::unique_ptr<BlockChainNode>& node);
+    HDWallet(const std::string& localPath, const std::string& seed, const std::shared_ptr<BlockChainNode>& node);
 
     ~HDWallet();
 
@@ -93,7 +94,7 @@ private:
 
 private:
     std::string mPath;
-    std::unique_ptr<BlockChainNode> mBlockChainNode;
+    std::shared_ptr<BlockChainNode> mBlockChainNode;
     int mCoinType = COIN_TYPE_ELA;
     bool mSingleAddress {false};
     std::unique_ptr<MasterPublicKey> mMasterPublicKey;

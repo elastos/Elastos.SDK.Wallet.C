@@ -65,7 +65,7 @@ void TestSingleWallet()
     printf("identity ret:%d\n", ret);
 
 
-    std::unique_ptr<BlockChainNode> node1 = std::make_unique<BlockChainNode>(TEST_NET_WALLET_SERVICE_URL);
+    std::shared_ptr<BlockChainNode> node1 = std::make_shared<BlockChainNode>(TEST_NET_WALLET_SERVICE_URL);
     std::shared_ptr<HDWallet> hdWallet;
     ret = identity->CreateSingleAddressWallet(seed, node1, &hdWallet);
     printf("hd wallet ret:%d\n", ret);
@@ -79,7 +79,7 @@ void TestSingleWallet()
 
     // hdWallet->SyncHistory();
 
-    // std::unique_ptr<BlockChainNode> node = std::make_unique<BlockChainNode>(TEST_NET_DID_SERVICE_URL);
+    // std::shared_ptr<BlockChainNode> node = std::make_shared<BlockChainNode>(TEST_NET_DID_SERVICE_URL);
     // std::shared_ptr<HDWallet> idChainWallet;
     // ret = identity->CreateSingleAddressWallet(seed, node, &idChainWallet);
 
@@ -163,7 +163,7 @@ void TestHDWallet()
     ret = IdentityManager::CreateIdentity("/Users/nathansfile/Elastos.SDK.Wallet.C", &identity);
     printf("identity ret:%d\n", ret);
 
-    std::unique_ptr<BlockChainNode> node1 = std::make_unique<BlockChainNode>(TEST_NET_WALLET_SERVICE_URL);
+    std::shared_ptr<BlockChainNode> node1 = std::make_shared<BlockChainNode>(TEST_NET_WALLET_SERVICE_URL);
     std::shared_ptr<HDWallet> hdWallet;
     ret = identity->CreateWallet(seed, COIN_TYPE_ELA, node1, &hdWallet);
     printf("hd wallet ret:%d\n", ret);

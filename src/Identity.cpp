@@ -11,7 +11,7 @@ Identity::Identity(const std::string& localPath)
     : mLocalPath(localPath)
 {}
 
-int Identity::CreateSingleAddressWallet(const std::string& seed, std::unique_ptr<BlockChainNode>& node, std::shared_ptr<HDWallet>* wallet)
+int Identity::CreateSingleAddressWallet(const std::string& seed, const std::shared_ptr<BlockChainNode>& node, std::shared_ptr<HDWallet>* wallet)
 {
     if (seed.empty() || !wallet) {
         return E_WALLET_C_INVALID_ARGUMENT;
@@ -23,7 +23,7 @@ int Identity::CreateSingleAddressWallet(const std::string& seed, std::unique_ptr
     return E_WALLET_C_OK;
 }
 
-int Identity::CreateWallet(const std::string& seed, int coinType, std::unique_ptr<BlockChainNode>& node, std::shared_ptr<HDWallet>* wallet)
+int Identity::CreateWallet(const std::string& seed, int coinType, const std::shared_ptr<BlockChainNode>& node, std::shared_ptr<HDWallet>* wallet)
 {
     if (seed.empty() || !wallet) {
         return E_WALLET_C_INVALID_ARGUMENT;

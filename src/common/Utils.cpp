@@ -1,5 +1,6 @@
 #include "Utils.h"
 #include "WalletError.h"
+#include <assert.h>
 
 namespace elastos {
 

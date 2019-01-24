@@ -5,6 +5,7 @@
 #include "common/Utils.h"
 #include "common/Log.hpp"
 #include <sstream>
+#include <string.h>
 
 #define DID_TABLE_NAME     "DID"
 #define DID_PROPERTIES_TABLE_NAME     "DIDProperties"

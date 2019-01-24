@@ -1,6 +1,8 @@
 #include <HttpClient.hpp>
 
 #include <iostream>
+#include <cstring>
+#include <algorithm>
 
 #include <curl/curl.h>
 #include <Log.hpp>
@@ -70,7 +72,7 @@ int HttpClient::Url(const std::string& url)
 int HttpClient::AddHeader(const std::string& name, const std::string& value)
 {
 	int ret = 0;
-	
+
 	ret = AddHeader(mReqHeaders, name, value);
 
 	return ret;
