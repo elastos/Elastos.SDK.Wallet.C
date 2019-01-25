@@ -175,7 +175,7 @@ long HDWallet::GetBalance(const std::string& address)
 
 long HDWallet::GetBalance()
 {
-    if (singleAddress) {
+    if (mSingleAddress) {
         return GetBalance(GetAddress(0, 0));
     }
 

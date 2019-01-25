@@ -2,7 +2,6 @@
 #include "Transaction.h"
 #include "BlockChainNode.h"
 #include "WalletError.h"
-#include "Elastos.Wallet.Utility.h"
 #include "common/Utils.h"
 #include <vector>
 #include "Identity.h"
@@ -17,8 +16,8 @@ void TestHDWallet();
 
 int main(int argc, char** argv)
 {
-    // TestSingleWallet();
-    TestHDWallet();
+    TestSingleWallet();
+    // TestHDWallet();
     return 0;
 }
 
@@ -89,26 +88,26 @@ void TestSingleWallet()
     // idChainWallet->SyncHistory();
 
 
-    std::vector<Transaction> transactions;
-    Transaction tx1("EdVgb5RTdmwKf79pEUdVNnFprWyvmr1hPc", 100000000L);
-    transactions.push_back(tx1);
-    Transaction tx2("ETajy5FmdzhngRUJmwKJFJBMv8EM8BhXnH", 100000000L);
-    transactions.push_back(tx2);
-    Transaction tx3("ENvWkDwYdt1m5F2Pi7WEVDXk89T8qne6jj", 50000000L);
-    transactions.push_back(tx3);
-    Transaction tx4("Ed2656EoB37fr2DSnqbLvp8G5cxDtZKYf4", 20000000L);
-    transactions.push_back(tx4);
-    Transaction tx5("EUFDLS15BFZHMGkRHTwM6Sz4gYuoejXrHZ", 10000000L);
-    transactions.push_back(tx5);
+    // std::vector<Transaction> transactions;
+    // Transaction tx1("EdVgb5RTdmwKf79pEUdVNnFprWyvmr1hPc", 100000000L);
+    // transactions.push_back(tx1);
+    // Transaction tx2("ETajy5FmdzhngRUJmwKJFJBMv8EM8BhXnH", 100000000L);
+    // transactions.push_back(tx2);
+    // Transaction tx3("ENvWkDwYdt1m5F2Pi7WEVDXk89T8qne6jj", 50000000L);
+    // transactions.push_back(tx3);
+    // Transaction tx4("Ed2656EoB37fr2DSnqbLvp8G5cxDtZKYf4", 20000000L);
+    // transactions.push_back(tx4);
+    // Transaction tx5("EUFDLS15BFZHMGkRHTwM6Sz4gYuoejXrHZ", 10000000L);
+    // transactions.push_back(tx5);
 
-    std::string txid;
-    ret = hdWallet->SendTransaction(transactions, "", seed, txid);
-    if (ret != E_WALLET_C_OK) {
-        printf("send transaction failed: %d\n", ret);
-        return;
-    }
+    // std::string txid;
+    // ret = hdWallet->SendTransaction(transactions, "", seed, txid);
+    // if (ret != E_WALLET_C_OK) {
+    //     printf("send transaction failed: %d\n", ret);
+    //     return;
+    // }
 
-    printf("txid: %s\n", txid.c_str());
+    // printf("txid: %s\n", txid.c_str());
 
 
     std::string histories;
@@ -131,17 +130,17 @@ void TestSingleWallet()
     std::string did = didObj->GetId();
     printf("did: %s\n", did.c_str());
 
-    // std::string str("[{\"Key\": \"name\", \"Value\":\"alice\"}]");
-    // std::string info = didObj->SignInfo(seed, str);
-    // printf("signed info: %s\n", info.c_str());
+    std::string str("[{\"Key\": \"name\", \"Value\":\"alice\"}]");
+    std::string info = didObj->SignInfo(seed, str);
+    printf("signed info: %s\n", info.c_str());
 
     // std::string txid = didObj->SetInfo(seed, str, idChainWallet);
     // printf("did set info txid: %s\n", txid.c_str());
 
     didObj->SyncInfo();
 
-    std::string info = didObj->GetInfo("name");
-    printf("the did info: %s\n", info.c_str());
+    // std::string info = didObj->GetInfo("name");
+    // printf("the did info: %s\n", info.c_str());
 
 }
 
