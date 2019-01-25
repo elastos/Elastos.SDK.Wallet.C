@@ -3,7 +3,7 @@ message(STATUS "curl include path: ${pkg-curl_INCLUDE_DIRS}")
 message(STATUS "curl library path: ${pkg-curl_STATIC_LDFLAGS}")
 
 file(GLOB HTTPCLIENT_SOURCES "*.cpp")
-add_library(httpclient STATIC ${HTTPCLIENT_SOURCES})
+add_library(httpclient OBJECT ${HTTPCLIENT_SOURCES})
 target_include_directories(httpclient PRIVATE "${pkg-curl_INCLUDE_DIRS}")
 target_link_libraries(httpclient ${pkg-curl_STATIC_LDFLAGS})
 target_link_libraries(httpclient common)
