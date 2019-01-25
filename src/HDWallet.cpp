@@ -12,7 +12,7 @@
 
 #define CLASS_TEXT "HDWallet"
 #define HISTORY_PAGE_SIZE   10
-#define HTTP_TIME_OUT       10000
+#define HTTP_TIME_OUT       30000
 
 #define ADDRESS_CHECK_INTERVAL  20
 
@@ -175,6 +175,10 @@ long HDWallet::GetBalance(const std::string& address)
 
 long HDWallet::GetBalance()
 {
+    if (singleAddress) {
+        return GetBalance(GetAddress(0, 0));
+    }
+
     long total = 0;
     std::vector<std::string> used = GetUsedAddresses();
     for (std::string addr : used) {
