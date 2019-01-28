@@ -11,5 +11,6 @@ target_link_libraries(database ${pkg-sqlite3_STATIC_LDFLAGS})
 if(DEFINED CFG_WITH_TEST)
 	add_executable(test-db test/DatabaseTest.cpp)
 	target_link_libraries(test-db database)
+	target_link_libraries(test-db common)
 endif()
 

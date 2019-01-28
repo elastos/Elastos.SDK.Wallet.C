@@ -28,5 +28,6 @@ install(TARGETS Elastos.SDK.Wallet.C
 
 if(DEFINED CFG_WITH_TEST)
     add_executable(test-wallet test/WalletTest.cpp)
-    target_link_libraries(test-wallet Elastos.SDK.Wallet.C Elastos.SDK.Keypair.C)
+    target_include_directories(test-wallet PRIVATE "${pkg-Elastos.SDK.Keypair.C_INCLUDE_DIRS}")
+    target_link_libraries(test-wallet Elastos.SDK.Wallet.C)
 endif()
