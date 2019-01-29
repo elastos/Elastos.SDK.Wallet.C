@@ -6,6 +6,8 @@
 
 #include "DidManager.h"
 
+#define DID_RECOVER_STEP    10
+
 namespace elastos{
 
 #define CLASS_TEXT  "DidManager"
@@ -40,6 +42,25 @@ int DidManager::CreateDid(int index, std::shared_ptr<Did>* did)
     free(publicKey);
 
     *did = temp;
+
+    return E_WALLET_C_OK;
+}
+
+int DidManager::Recover()
+{
+    int end = DID_RECOVER_STEP, count = 0, ret = 0;
+    for (int i = 0; i < end; i++) {
+        std::shared_ptr<Did> did;
+        ret = CreateDid(i, &did);
+        if (ret != E_WALLET_C_OK) return ret;
+
+        ret = did->SyncInfo();
+        if (ret > 0) end++;
+        else if (ret == 0) count++;
+        else continue;
+
+        if (count >= DID_RECOVER_STEP) break;
+    }
 
     return E_WALLET_C_OK;
 }

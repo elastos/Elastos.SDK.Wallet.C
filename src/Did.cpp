@@ -139,7 +139,7 @@ int Did::SyncInfo()
     CDidDb db(mPath);
     db.InsertProperty(mDid, properties);
 
-    return E_WALLET_C_OK;
+    return jProperties.size();
 }
 
 std::string Did::GetInfo(const std::string& key)

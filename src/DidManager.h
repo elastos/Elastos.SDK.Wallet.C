@@ -14,6 +14,8 @@ public:
 
     int CreateDid(int index, std::shared_ptr<Did>* did);
 
+    int Recover();
+
 private:
     std::string mLocalPath;
     std::unique_ptr<MasterPublicKey> mMasterPublicKey;
