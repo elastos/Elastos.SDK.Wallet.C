@@ -14,27 +14,27 @@ int IdentityManager::ImportFromFile(const std::string& filePath, std::shared_ptr
 void IdentityManager::ExportToFile(const std::shared_ptr<Identity>& identity, const std::string& filePath)
 {}
 
-std::string IdentityManager::GetMnemonic(const std::string& lanaguage, const std::string& words)
+std::string IdentityManager::GetMnemonic(const std::string& language, const std::string& words)
 {
-    if (lanaguage.empty() || (lanaguage.compare("english") && words.empty())) {
+    if (language.empty() || (language.compare("english") && words.empty())) {
         return "";
     }
-    char* mnemonic = generateMnemonic(lanaguage.c_str(), words.c_str());
+    char* mnemonic = generateMnemonic(language.c_str(), words.c_str());
     std::string str = mnemonic;
     free(mnemonic);
     return str;
 }
 
 std::string IdentityManager::GetSeed(const std::string& mnemonic,
-        const std::string& lanaguage, const std::string& words, const std::string& mnmonicPassword)
+        const std::string& language, const std::string& words, const std::string& mnemonicPassword)
 {
-    if (mnemonic.empty() || lanaguage.empty() || (lanaguage.compare("english") && words.empty())) {
+    if (mnemonic.empty() || language.empty() || (language.compare("english") && words.empty())) {
         return "";
     }
 
     void* seed;
     int seedLen = getSeedFromMnemonic(&seed, mnemonic.c_str(),
-            lanaguage.c_str(), words.c_str(), mnmonicPassword.c_str());
+            language.c_str(), words.c_str(), mnemonicPassword.c_str());
     if (seedLen == 0) {
         return "";
     }

@@ -1,5 +1,7 @@
 # Elastos.SDK.Wallet.C
 
+[Elastos.SDK.Wallet.C documentation](https://walletsdkc.readthedocs.io)
+
 ## Build on Ubuntu 64bit
 ### Check the required tools
 Make sure your computer have installed the required packages below:
@@ -10,18 +12,14 @@ Make sure your computer have installed the required packages below:
 ### Build for linux
 
 ```shell
-$ . ./scripts/linux.sh
-$ cmake -D CMAKE_BUILD_TYPE=Debug/Release ../../..
-$ make
+$ ./scripts/build.sh
 ```
 
 ### Build for android
 
 ```shell
-$ export ANDROID_NDK=~/your_android_ndk_dir
-$ . ./scripts/android.sh armeavi-v7a(for armv7)/arm64(for armv8)/x86
-$ cmake -D CMAKE_BUILD_TYPE=Debug/Release ../../..
-$ make
+$ export ANDROID_NDK_HOME={your android ndk path}
+$ ./scripts/build.sh -f Android
 ```
 
 
@@ -29,8 +27,5 @@ $ make
 ### Build for ios simulator
 
 ```shell
-$ cd build
-$ . ./scripts/ios.sh x86_64
-$ cmake -D CMAKE_BUILD_TYPE=Debug/Release ../../..
-$ make -j4
+$ ./scripts/build.sh -f Android
 ```

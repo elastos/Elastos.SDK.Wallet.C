@@ -15,9 +15,9 @@ public:
 
     static void ExportToFile(const std::shared_ptr<Identity>& identity, const std::string& filePath);
 
-    static std::string GetMnemonic(const std::string& lanaguage, const std::string& words);
+    static std::string GetMnemonic(const std::string& language, const std::string& words);
 
-    static std::string GetSeed(const std::string& mnemonic, const std::string& lanaguage, const std::string& words, const std::string& mnmonicPassword);
+    static std::string GetSeed(const std::string& mnemonic, const std::string& language, const std::string& words, const std::string& mnemonicPassword);
 
     static int CreateIdentity(const std::string& localPath, std::shared_ptr<Identity>* identity);
 };
