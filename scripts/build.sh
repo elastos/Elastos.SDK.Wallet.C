@@ -14,7 +14,11 @@ git submodule update;
 build_extfunc_depends()
 {
 	"$DEPENDS_DIR/scripts/build-curl.sh" $@;
-	"$DEPENDS_DIR/scripts/build-sqlite.sh" $@;
+    if [[ $CFG_TARGET_PLATFORM == "iOS" ]]; then
+        loginfo "Ignore to build sqlite for iOS, use buildin."
+    else
+        "$DEPENDS_DIR/scripts/build-sqlite.sh" $@;
+    fi
 
 	#CFG_BUILD_ROOT
 	"$DEPENDS_DIR/scripts/build-Elastos.SDK.Keypair.C.sh" $@;
