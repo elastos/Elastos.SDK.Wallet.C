@@ -128,7 +128,7 @@ std::string HDWallet::GetAddress(int chain, int index)
     char* address = getAddress(publicKey.c_str());
     std::string ret = address;
     free(address);
-    return address;
+    return ret;
 }
 
 std::string HDWallet::GetPublicKey(int chain, int index)

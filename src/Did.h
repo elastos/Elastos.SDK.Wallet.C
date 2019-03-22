@@ -26,12 +26,15 @@ public:
 
     std::string GetInfo(const std::string& key);
 
+    void SetNode(const std::shared_ptr<BlockChainNode>& node);
+
 private:
     int GenDidUploadInfo(const std::string& json, uint8_t** buf);
 
     std::string SignInfo(const std::string& seed, const uint8_t* message, int len);
 
 private:
+    std::shared_ptr<BlockChainNode> mBlockChainNode;
     std::string mPublicKey;
     std::string mDid;
     std::string mPath;

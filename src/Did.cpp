@@ -18,6 +18,9 @@ Did::Did(const std::string& publicKey, int index, const std::string& path)
     , mPath(path)
 {
     assert(!publicKey.empty());
+
+    mBlockChainNode = std::make_shared<BlockChainNode>(DID_SERVICE_URL);
+
     char* did = getDid(publicKey.c_str());
     mDid = did;
     free(did);
@@ -80,7 +83,7 @@ int Did::SyncInfo()
     HttpClient httpClient;
     HttpClient::InitGlobal();
 
-    std::string url = TEST_NET ? TEST_NET_DID_SERVICE_URL : DID_SERVICE_URL;
+    std::string url = mBlockChainNode->GetUrl();
     url.append("/api/1/didexplorer/did/");
     url.append(mDid);
     url.append("?detailed=true");
@@ -220,6 +223,12 @@ int Did::GenDidUploadInfo(const std::string& json, uint8_t** buf)
 
     *buf = binary;
     return len;
+}
+
+void Did::SetNode(const std::shared_ptr<BlockChainNode>& node)
+{
+    mBlockChainNode.reset();
+    mBlockChainNode = node;
 }
 
 }

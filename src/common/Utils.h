@@ -6,8 +6,6 @@
 
 namespace elastos {
 
-#define TEST_NET    true
-
 #define TEST_DB_FILE    "ElastosWalletTest.db"
 #define DB_FILE         "ElastosWallet.db"
 

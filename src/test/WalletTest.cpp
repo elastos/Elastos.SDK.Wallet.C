@@ -49,7 +49,7 @@ void TestSingleWallet()
 {
     int ret;
     const char* mnemonic = "血 坝 告 售 代 讨 转 枝 欧 旦 诚 抱";
-    const char* path = "/Users/nathansfile/Elastos.SDK.Keypair.C/src/Data/mnemonic_chinese.txt";
+    const char* path = "~/work/Elastos.SDK.Keypair.C/src/Data/mnemonic_chinese.txt";
     char* words = readMnemonicFile(path);
     if (!words) {
         printf("read file failed\n");
@@ -78,14 +78,14 @@ void TestSingleWallet()
 
     // hdWallet->SyncHistory();
 
-    // std::shared_ptr<BlockChainNode> node = std::make_shared<BlockChainNode>(TEST_NET_DID_SERVICE_URL);
-    // std::shared_ptr<HDWallet> idChainWallet;
-    // ret = identity->CreateSingleAddressWallet(seed, node, &idChainWallet);
+    std::shared_ptr<BlockChainNode> node = std::make_shared<BlockChainNode>(TEST_NET_DID_SERVICE_URL);
+    std::shared_ptr<HDWallet> idChainWallet;
+    ret = identity->CreateSingleAddressWallet(seed, node, &idChainWallet);
 
-    // balance = idChainWallet->GetBalance(hdSingleAddress);
-    // printf("id chain balance: %ld\n", balance);
+    balance = idChainWallet->GetBalance(hdSingleAddress);
+    printf("id chain balance: %ld\n", balance);
 
-    // idChainWallet->SyncHistory();
+    idChainWallet->SyncHistory();
 
 
     // std::vector<Transaction> transactions;
@@ -129,6 +129,8 @@ void TestSingleWallet()
     ret = manager->CreateDid(0, &didObj);
     std::string did = didObj->GetId();
     printf("did: %s\n", did.c_str());
+
+    didObj->SetNode(node);
 
     std::string str("[{\"Key\": \"name\", \"Value\":\"alice\"}]");
     std::string info = didObj->SignInfo(seed, str);

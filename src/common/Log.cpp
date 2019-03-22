@@ -169,6 +169,10 @@ inline void Log::log(const char head, const char* tag, const char* format, va_li
 #elif defined(__ANDROID__)
   int prio = convPrio(head);
   __android_log_vprint(prio, tag, format, ap);
+#else
+  printf("%c/%s ", head, tag);
+  vprintf(format, ap);
+  printf("\n");
 #endif
 }
 

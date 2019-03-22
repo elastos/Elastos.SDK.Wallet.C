@@ -16,7 +16,7 @@ CHistoryDb::CHistoryDb(const std::string& filePath, const std::string& tableName
 {
     std::string dbFile(filePath);
     dbFile += "/";
-    dbFile += TEST_NET ? TEST_DB_FILE : DB_FILE;
+    dbFile += DB_FILE;
     int ret = sqlite3_open(dbFile.c_str(), &mDb);
     if (ret !=  SQLITE_OK) {
         CloseDb();
