@@ -12,7 +12,7 @@
 
 #define CLASS_TEXT "HDWallet"
 #define HISTORY_PAGE_SIZE   10
-#define HTTP_TIME_OUT       30000
+#define HTTP_TIME_OUT       5000
 
 #define ADDRESS_CHECK_INTERVAL  20
 
@@ -471,7 +471,7 @@ int HDWallet::HttpPost(const std::string& api, const std::string& body, std::str
         return ret;
     }
 
-    httpClient.SetTimeout(HTTP_TIME_OUT);
+    httpClient.SetConnectTimeout(HTTP_TIME_OUT);
     httpClient.SetHeader("Content-Type", "application/json");
 
     ret = httpClient.SyncPost(body.c_str());
@@ -548,7 +548,7 @@ int HDWallet::GetHistoryAndSave(const std::string& address, int page, CHistoryDb
     Log::D(CLASS_TEXT, "url: %s\n", url.c_str());
 
     httpClient.Url(url);
-    httpClient.SetTimeout(HTTP_TIME_OUT);
+    httpClient.SetConnectTimeout(HTTP_TIME_OUT);
     httpClient.SetHeader("Content-Type", "application/json");
     int ret = httpClient.SyncGet();
     if (ret != E_WALLET_C_OK) {

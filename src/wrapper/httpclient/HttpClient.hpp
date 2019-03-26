@@ -43,7 +43,7 @@ public:
 	int Url(const std::string& url);
 	int AddHeader(const std::string& name, const std::string& value);
 	int SetHeader(const std::string& name, const std::string& value);
-	int SetTimeout(unsigned long milliSecond);
+	int SetConnectTimeout(unsigned long milliSecond);
 
 	int SyncGet();
 	int SyncPost(const int8_t* body, int size);
@@ -79,7 +79,7 @@ private:
 				  const std::string& name, const std::string& value) const;
 
 	std::string mUrl;
-	long mTimeoutMS;
+	long mConnectTimeoutMS;
 	HeaderMap mReqHeaders;
 
 	int mRespStatus;

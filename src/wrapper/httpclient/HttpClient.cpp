@@ -40,7 +40,7 @@ int HttpClient::InitGlobal()
 /* =========================================== */
 HttpClient::HttpClient()
 	: mUrl()
-	, mTimeoutMS(10000)
+	, mConnectTimeoutMS(5000)
 	, mReqHeaders()
 	, mRespStatus(-1)
 	, mRespReason()
@@ -95,9 +95,9 @@ int HttpClient::SetHeader(const std::string& name, const std::string& value)
 	return ret;
 }
 
-int HttpClient::SetTimeout(unsigned long milliSecond)
+int HttpClient::SetConnectTimeout(unsigned long milliSecond)
 {
-	mTimeoutMS = milliSecond;
+	mConnectTimeoutMS = milliSecond;
 
 	return 0;
 }
@@ -341,7 +341,7 @@ int HttpClient::MakeCurl(std::shared_ptr<void>& curlHandlePtr, std::shared_ptr<s
 	curle = curl_easy_setopt(curlHandlePtr.get(), CURLOPT_HTTPHEADER, curlHeadersPtr.get());
 	CHECK_ERROR(curle);
 
-	curle = curl_easy_setopt(curlHandlePtr.get(), CURLOPT_TIMEOUT_MS, mTimeoutMS);
+	curle = curl_easy_setopt(curlHandlePtr.get(), CURLOPT_CONNECTTIMEOUT_MS, mConnectTimeoutMS);
 	CHECK_ERROR(curle);
 
 	curle = curl_easy_setopt(curlHandlePtr.get(), CURLOPT_HEADERFUNCTION, CurlHeaderCallback);

@@ -17,6 +17,7 @@ Did::Did(const std::string& publicKey, int index, const std::string& path)
     , mIndex(index)
     , mPath(path)
 {
+    mBlockChainNode = std::make_shared<BlockChainNode>(DID_SERVICE_URL);
     assert(!publicKey.empty());
 
     mBlockChainNode = std::make_shared<BlockChainNode>(DID_SERVICE_URL);
@@ -86,12 +87,12 @@ int Did::SyncInfo()
     std::string url = mBlockChainNode->GetUrl();
     url.append("/api/1/didexplorer/did/");
     url.append(mDid);
-    url.append("?detailed=true");
+    url.append("/status/normal?detailed=true");
 
     Log::D("Did", "url: %s\n", url.c_str());
 
     httpClient.Url(url);
-    httpClient.SetTimeout(5000);
+    httpClient.SetConnectTimeout(5000);
     httpClient.SetHeader("Content-Type", "application/json");
     int ret = httpClient.SyncGet();
     if (ret != E_WALLET_C_OK) {
