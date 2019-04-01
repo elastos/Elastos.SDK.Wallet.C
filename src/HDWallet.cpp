@@ -309,6 +309,11 @@ int HDWallet::SingleAddressCreateTx(const std::vector<Transaction>& transactions
     }
 
     nlohmann::json jRet = nlohmann::json::parse(json);
+    int status = jRet["status"].get<int>();
+    if (status != 200) {
+        Log::E(CLASS_TEXT, "create transaction error: %s\n", jRet["result"].get<std::string>().c_str());
+        return E_WALLET_C_INTERNAL_ERROR;
+    }
     nlohmann::json jResult = jRet["result"];
 
     uint8_t* seedBuf;
@@ -381,6 +386,12 @@ int HDWallet::HDCreateTx(const std::vector<Transaction>& transactions,
     }
 
     nlohmann::json jRet = nlohmann::json::parse(json);
+    int status = jRet["status"].get<int>();
+    if (status != 200) {
+        Log::E(CLASS_TEXT, "create transaction error: %s\n", jRet["result"].get<std::string>().c_str());
+        return E_WALLET_C_INTERNAL_ERROR;
+    }
+
     nlohmann::json jResult = jRet["result"];
 
     uint8_t* seedBuf;
@@ -659,8 +670,9 @@ check:
 
     if (!generate || count >= gap) return E_WALLET_C_OK;
 
-    GetUnUsedAddresses(gap - count, chain);
+    std::vector<std::string> unused = GetUnUsedAddresses(gap - count, chain);
     start = addrs.size();
+    addrs.insert(addrs.end(), unused.begin(), unused.end());
     goto check;
 }
 
