@@ -7,6 +7,7 @@
 #include "HDWallet.h"
 #include "Did.h"
 #include "DidManager.h"
+#include "MultiSignWallet.h"
 
 namespace elastos {
 
@@ -20,9 +21,8 @@ public:
 
     int CreateWallet(const std::string& seed, int coinType, const std::shared_ptr<BlockChainNode>& node, std::shared_ptr<HDWallet>* wallet);
 
-    // int GetWallet(const std::string& seed, const std::vector<std::string>& publicKeys,
-    //         const std::string& privateKey, int requiredCount, int coinType,
-    //         std::shared_ptr<MultiSignWallet>* wallet);
+    int CreateWallet(const std::vector<std::string>& publicKeys, int requiredCount,
+            int coinType, const std::shared_ptr<BlockChainNode>& node, std::shared_ptr<MultiSignWallet>* wallet);
 
     int CreateDidManager(const std::string& seed, std::shared_ptr<DidManager>* manager);
 

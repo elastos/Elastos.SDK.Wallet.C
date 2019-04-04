@@ -35,12 +35,18 @@ int Identity::CreateWallet(const std::string& seed, int coinType, const std::sha
     return E_WALLET_C_OK;
 }
 
-// int Identity::GetWallet(const std::string& seed, const std::vector<std::string>& publicKeys,
-//         const std::string& privateKey, int requiredCount, int coinType,
-//         std::shared_ptr<MultiSignWallet>* wallet)
-// {
-//     return E_WALLET_C_OK;
-// }
+int Identity::CreateWallet(const std::vector<std::string>& publicKeys, int requiredCount,
+        int coinType, const std::shared_ptr<BlockChainNode>& node, std::shared_ptr<MultiSignWallet>* wallet)
+{
+    if (publicKeys.size() == 0 || !wallet) {
+        return E_WALLET_C_INVALID_ARGUMENT;
+    }
+
+    std::shared_ptr<MultiSignWallet> multiSignWallet = std::make_shared<MultiSignWallet>(mLocalPath, publicKeys, requiredCount, node, coinType);
+    *wallet = multiSignWallet;
+
+    return E_WALLET_C_OK;
+}
 
 int Identity::CreateDidManager(const std::string& seed, std::shared_ptr<DidManager>* manager)
 {

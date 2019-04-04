@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include "Wallet.h"
 
 extern "C" {
 extern const int COIN_TYPE_ELA;
@@ -19,7 +20,7 @@ namespace elastos {
 
 class CHistoryDb;
 
-class HDWallet
+class HDWallet : public Wallet
 {
 public:
 
@@ -41,6 +42,8 @@ public:
     std::string GetAddress(int chain, int index);
 
     std::string GetPublicKey(int chain, int index);
+
+    std::string GetPrivateKey(const std::string& seed, int chain, int index);
 
     long GetBalance(const std::string& address);
 
@@ -65,24 +68,9 @@ private:
     int HDCreateTx(const std::vector<Transaction>& transactions,
             const std::string& memo, const std::string& seed, const std::string& chain, std::string& txJson);
 
-    int CreateTransaction(const std::vector<Transaction>& transactions,
-            const std::vector<std::string>& addresses, const std::string& chain, std::string& txJson);
-
-    int SendSignedTx(const std::string& signedTx, std::string& result);
-
-    int HttpPost(const std::string& api, const std::string& body, std::string& result);
-
-    int SyncHistory(const std::string& address, bool* hasHistory = nullptr);
-
-    int GetHistoryAndSave(const std::string& address, int page, CHistoryDb& db, int* total = nullptr);
-
     int SyncMultiHistory(int gap);
 
     int SyncMultiHistory(int gap, int chain, bool generate = false);
-
-    std::string GetTableName();
-
-    int InsertSendingTx(const std::vector<Transaction>& transactions, const std::string& memo, const std::string& txid, const std::string& tx);
 
     void Init();
 
