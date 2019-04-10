@@ -38,10 +38,10 @@ public:
     int SyncHistory();
 
     // create a new transaction
-    std::string SignTransaction(const std::vector<Transaction>& transactions, const std::string& privateKey);
+    std::string SignTransaction(const std::vector<Transaction>& transactions, const std::string& seed, int chain, int index);
 
     // sign the transaction from cosigner
-    std::string SignTransaction(const std::string& json, const std::string& privateKey);
+    std::string SignTransaction(const std::string& json, const std::string& seed, int chain, int index);
 
     // send the signed transaction
     int SendTransaction(const std::string& json, std::string& txid);

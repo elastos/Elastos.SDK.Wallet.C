@@ -28,6 +28,8 @@ protected:
 
     int GetCoinType();
 
+    std::string GetPrivateKey(const std::string& seed, int chain, int index);
+
     int SyncHistory(const std::string& address, bool* hasHistory = nullptr);
 
     int GetHistoryAndSave(const std::string& address, int page, CHistoryDb& db, int* total = nullptr);

@@ -51,9 +51,9 @@ int MultiSignWallet::SyncHistory()
     return Wallet::SyncHistory(mAddress);
 }
 
-std::string MultiSignWallet::SignTransaction(const std::vector<Transaction>& transactions, const std::string& privateKey)
+std::string MultiSignWallet::SignTransaction(const std::vector<Transaction>& transactions, const std::string& seed, int chain, int index)
 {
-    if (transactions.size() == 0 || privateKey.empty() || mPublicKeys == NULL) {
+    if (transactions.size() == 0 || seed.empty() || chain < 0 || index < 0 || mPublicKeys == NULL) {
         Log::E(CLASS_TEXT, "SignTransaction invalid argument\n");
         return "";
     }
@@ -70,15 +70,17 @@ std::string MultiSignWallet::SignTransaction(const std::vector<Transaction>& tra
     nlohmann::json jRet = nlohmann::json::parse(json);
     nlohmann::json jResult = jRet["result"];
 
-    return SignTransaction(jResult.dump(), privateKey);
+    return SignTransaction(jResult.dump(), seed, chain, index);
 }
 
-std::string MultiSignWallet::SignTransaction(const std::string& json, const std::string& privateKey)
+std::string MultiSignWallet::SignTransaction(const std::string& json, const std::string& seed, int chain, int index)
 {
-    if (json.empty() || privateKey.empty() || mPublicKeys == NULL) {
+    if (json.empty() || seed.empty() || chain < 0 || index < 0 || mPublicKeys == NULL) {
         Log::E(CLASS_TEXT, "SignTransaction invalid argument\n");
         return "";
     }
+
+    std::string privateKey = Wallet::GetPrivateKey(seed, chain, index);
 
     char* signedTx = multiSignTransaction(privateKey.c_str(), mPublicKeys, mPublicKeyLen, mRequireCount, json.c_str());
     if (signedTx == NULL) {

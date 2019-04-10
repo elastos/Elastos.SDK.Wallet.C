@@ -20,6 +20,23 @@ int Wallet::GetCoinType()
     return mCoinType;
 }
 
+std::string Wallet::GetPrivateKey(const std::string& seed, int chain, int index)
+{
+    uint8_t* seedBuf;
+    int seedLen = Utils::Str2Hex(seed, &seedBuf);
+    if (seedLen == 0) {
+        Log::E(CLASS_TEXT, "seed is empty\n");
+        return "";
+    }
+
+    char* privateKey = generateSubPrivateKey(seedBuf, seedLen, mCoinType, chain, index);
+    free(seedBuf);
+
+    std::string ret = privateKey;
+    free(privateKey);
+    return ret;
+}
+
 int Wallet::SyncHistory(const std::string& address, bool* hasHistory)
 {
     CHistoryDb db(mPath, GetTableName());

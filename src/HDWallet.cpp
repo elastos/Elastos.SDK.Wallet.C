@@ -136,19 +136,7 @@ std::string HDWallet::GetPrivateKey(const std::string& seed, int chain, int inde
     int param1 = mSingleAddress ? EXTERNAL_CHAIN : chain;
     int param2 = mSingleAddress ? 0 : index;
 
-    uint8_t* seedBuf;
-    int seedLen = Utils::Str2Hex(seed, &seedBuf);
-    if (seedLen == 0) {
-        Log::E(CLASS_TEXT, "seed is empty\n");
-        return "";
-    }
-
-    char* privateKey = generateSubPrivateKey(seedBuf, seedLen, mCoinType, param1, param2);
-    free(seedBuf);
-
-    std::string ret = privateKey;
-    free(privateKey);
-    return ret;
+    return Wallet::GetPrivateKey(seed, param1, param2);
 }
 
 long HDWallet::GetBalance(const std::string& address)

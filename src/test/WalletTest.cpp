@@ -240,10 +240,16 @@ void TestMultiSignWallet()
     publicKeys.push_back("0306ee2fa3fb66e21b61ac1af9ce95271d9bb5fc902f92bd9ff6333bda552ebc64");
     publicKeys.push_back("03b8d95fa2a863dcbd44bf288040df4c6cb9d674a61c4c1e3638ac515994c777e5");
 
-    std::vector<std::string> privateKeys;
-    privateKeys.push_back("79b442f402a50c1f3026edfa160a6555c0f9c48a86d85ab103809008a913f07b");
-    privateKeys.push_back("37878ce7b4b509aee357996a7d0a0e0e478759be034503b7b6438356d2200973");
-    privateKeys.push_back("0c2e640e0e025d58f6630a0fecea2419f26bb7fea6c67cd9c32aa4f1116ef74e");
+    const char* mnemonic = "血 坝 告 售 代 讨 转 枝 欧 旦 诚 抱";
+    const char* path = "/Users/huahua/repo/Elastos.SDK.Keypair.C/src/Data/mnemonic_chinese.txt";
+    char* words = readMnemonicFile(path);
+    if (!words) {
+        printf("read file failed\n");
+        return;
+    }
+
+    std::string seed = IdentityManager::GetSeed(mnemonic, "chinese", words, "");
+    printf("seed:%s\n", seed.c_str());
 
     std::shared_ptr<Identity> identity;
     int ret = IdentityManager::CreateIdentity("/Users/huahua/repo/Elastos.SDK.Wallet.C", &identity);
@@ -269,10 +275,10 @@ void TestMultiSignWallet()
     // Transaction tx1(addr, 1000000L);
     // transactions.push_back(tx1);
 
-    // std::string json = wallet->SignTransaction(transactions, privateKeys[1]);
+    // std::string json = wallet->SignTransaction(transactions, seed, 0, 1);
     // printf("first sign: %s\n", json.c_str());
 
-    // json = wallet->SignTransaction(json, privateKeys[2]);
+    // json = wallet->SignTransaction(json, seed, 0, 2);
     // printf("second sign: %s\n", json.c_str());
 
     // std::string txid;
