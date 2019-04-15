@@ -123,6 +123,17 @@ int MultiSignWallet::SendTransaction(const std::string& json, std::string& txid)
 std::vector<std::string> MultiSignWallet::GetSignedSigners(const std::string& json)
 {
     std::vector<std::string> singedSingers;
+
+    int len = 0;
+    char** signedArray = getSignedSigners(json.c_str(), &len);
+    if (signedArray != NULL) {
+        for (int i = 0; i < len; i++) {
+            singedSingers.push_back(signedArray[i]);
+            free(signedArray[i]);
+        }
+        free(signedArray);
+    }
+
     return singedSingers;
 }
 

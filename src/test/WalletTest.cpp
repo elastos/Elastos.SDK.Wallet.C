@@ -271,15 +271,20 @@ void TestMultiSignWallet()
 
     std::string addr = GetAddress();
     printf("to addr: %s\n", addr.c_str());
-    // std::vector<Transaction> transactions;
-    // Transaction tx1(addr, 1000000L);
-    // transactions.push_back(tx1);
+    std::vector<Transaction> transactions;
+    Transaction tx1(addr, 1000000L);
+    transactions.push_back(tx1);
 
-    // std::string json = wallet->SignTransaction(transactions, seed, 0, 1);
-    // printf("first sign: %s\n", json.c_str());
+    std::string json = wallet->SignTransaction(transactions, seed, 0, 1);
+    printf("first sign: %s\n", json.c_str());
 
-    // json = wallet->SignTransaction(json, seed, 0, 2);
-    // printf("second sign: %s\n", json.c_str());
+    json = wallet->SignTransaction(json, seed, 0, 2);
+    printf("second sign: %s\n", json.c_str());
+
+    std::vector<std::string> signedSigners = wallet->GetSignedSigners(json);
+    for (int i = 0; i < signedSigners.size(); i++) {
+        printf("signed: %s\n", signedSigners[i].c_str());
+    }
 
     // std::string txid;
     // ret = wallet->SendTransaction(json, txid);

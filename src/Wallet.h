@@ -7,6 +7,7 @@
 #include <Transaction.h>
 #include <string>
 #include <vector>
+#include <memory>
 
 extern "C" {
     extern const int COIN_TYPE_ELA;

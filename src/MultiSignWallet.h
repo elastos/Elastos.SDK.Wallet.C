@@ -5,6 +5,8 @@
 #include <Transaction.h>
 #include <BlockChainNode.h>
 #include <vector>
+#include <string>
+#include <memory>
 #include "Wallet.h"
 
 extern "C" {
