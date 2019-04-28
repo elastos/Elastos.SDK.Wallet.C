@@ -18,9 +18,9 @@ void TestMultiSignWallet();
 
 int main(int argc, char** argv)
 {
-    // TestSingleWallet();
+    TestSingleWallet();
     // TestHDWallet();
-    TestMultiSignWallet();
+    // TestMultiSignWallet();
     return 0;
 }
 
@@ -79,7 +79,7 @@ void TestSingleWallet()
     long balance = hdWallet->GetBalance(hdSingleAddress);
     printf("balance: %ld\n", balance);
 
-    // hdWallet->SyncHistory();
+    hdWallet->SyncHistory();
 
     std::shared_ptr<BlockChainNode> node = std::make_shared<BlockChainNode>(TEST_NET_DID_SERVICE_URL);
     std::shared_ptr<HDWallet> idChainWallet;
@@ -139,13 +139,17 @@ void TestSingleWallet()
     std::string info = didObj->SignInfo(seed, str);
     printf("signed info: %s\n", info.c_str());
 
-    // std::string txid = didObj->SetInfo(seed, str, idChainWallet);
+    std::string encryptInfo = didObj->SignInfo(seed, str, true);
+    printf("encrypt signed info: %s\n", encryptInfo.c_str());
+
+    // std::string enctyptInfo("[{\"Key\": \"PhoneNumber\", \"Value\":\"1234566789\"}]");
+    // std::string txid = didObj->SetInfo(seed, enctyptInfo, idChainWallet, true);
     // printf("did set info txid: %s\n", txid.c_str());
 
     didObj->SyncInfo();
 
-    // std::string info = didObj->GetInfo("name");
-    // printf("the did info: %s\n", info.c_str());
+    std::string getInfo = didObj->GetInfo("PhoneNumber", true, seed);
+    printf("the did info: %s\n", getInfo.c_str());
 
 }
 

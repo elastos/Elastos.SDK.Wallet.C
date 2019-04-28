@@ -32,10 +32,10 @@ std::string Did::GetId()
     return mDid;
 }
 
-std::string Did::SignInfo(const std::string& seed, const std::string& json)
+std::string Did::SignInfo(const std::string& seed, const std::string& json, bool encrypt)
 {
     uint8_t* buf;
-    int len = GenDidUploadInfo(json, &buf);
+    int len = GenDidUploadInfo(json, encrypt, &buf);
     if (len <= 0) {
         Log::E("Did", "generate upload json data failed\n");
         return "";
@@ -58,9 +58,9 @@ std::string Did::SignInfo(const std::string& seed, const std::string& json)
     return memo.dump();
 }
 
-std::string Did::SetInfo(const std::string& seed, const std::string& json, const std::shared_ptr<HDWallet>& wallet)
+std::string Did::SetInfo(const std::string& seed, const std::string& json, const std::shared_ptr<HDWallet>& wallet, bool encrypt)
 {
-    std::string memo = SignInfo(seed, json);
+    std::string memo = SignInfo(seed, json, encrypt);
     if (memo.empty()) {
         Log::E("Did", "sign did info and generate memo failed\n");
         return "";
@@ -146,7 +146,7 @@ int Did::SyncInfo()
     return jProperties.size();
 }
 
-std::string Did::GetInfo(const std::string& key)
+std::string Did::GetInfo(const std::string& key, bool encrypt, const std::string& seed)
 {
     CDidDb db(mPath);
     DidProperty property;
@@ -156,10 +156,32 @@ std::string Did::GetInfo(const std::string& key)
         return "";
     }
 
+    std::string value;
+    if (encrypt) {
+        if (seed.empty()) {
+            Log::E("Did", "encrypted info need private key!\n");
+            return "";
+        }
+
+        std::string privateKey = GetPrivateKey(seed);
+        int len = 0;
+        char* decrypted = eciesDecrypt(privateKey.c_str(), property.mProperty.c_str(), &len);
+        if (decrypted == NULL || len == 0) {
+            Log::E("Did", "decrypt failed!\n");
+            return "";
+        }
+
+        value = decrypted;
+        free(decrypted);
+    }
+    else {
+        value = property.mProperty;
+    }
+
     nlohmann::json jpro = {
         {"did", mDid},
         {"key", key},
-        {"value", property.mProperty},
+        {"value", value},
         {"blockTime", property.mBlockTime},
         {"txid", property.mTxid}
     };
@@ -168,23 +190,18 @@ std::string Did::GetInfo(const std::string& key)
 
 std::string Did::SignInfo(const std::string& seed, const uint8_t* message, int len)
 {
-    uint8_t* seedBuf;
-    int seedLen = Utils::Str2Hex(seed, &seedBuf);
-    char* privateKey = generateSubPrivateKey(seedBuf, seedLen, COIN_TYPE_ELA, EXTERNAL_CHAIN, mIndex);
-    free(seedBuf);
+    std::string privateKey = GetPrivateKey(seed);
 
-    char* publicKey = getPublicKeyFromPrivateKey(privateKey);
+    char* publicKey = getPublicKeyFromPrivateKey(privateKey.c_str());
     if (mPublicKey.compare(publicKey)) {
         Log::E("Did", "private key is not match the publick key\n");
-        free(privateKey);
         free(publicKey);
         return "";
     }
     free(publicKey);
 
     void* signedData;
-    int signedLen = sign(privateKey, message, len, &signedData);
-    free(privateKey);
+    int signedLen = sign(privateKey.c_str(), message, len, &signedData);
     if (signedLen <= 0) {
         Log::E("Did", "sign data failed\n");
         return "";
@@ -193,7 +210,7 @@ std::string Did::SignInfo(const std::string& seed, const uint8_t* message, int l
     return Utils::Hex2Str((const uint8_t*)signedData, signedLen);
 }
 
-int Did::GenDidUploadInfo(const std::string& json, uint8_t** buf)
+int Did::GenDidUploadInfo(const std::string& json, bool encrypt, uint8_t** buf)
 {
     std::vector<nlohmann::json> properties = nlohmann::json::parse(json);
     nlohmann::json didInfo;
@@ -204,6 +221,12 @@ int Did::GenDidUploadInfo(const std::string& json, uint8_t** buf)
     didInfo["Did"] = mDid;
     for (int i = 0; i < properties.size(); i++) {
         properties[i]["Status"] = "Normal";
+        if (!encrypt) continue;
+
+        std::string value = properties[i]["Value"];
+        char* encrypted = eciesEncrypt(mPublicKey.c_str(), value.c_str());
+        properties[i]["Value"] = encrypted;
+        free(encrypted);
     }
     didInfo["Properties"] = properties;
 
@@ -230,6 +253,18 @@ void Did::SetNode(const std::shared_ptr<BlockChainNode>& node)
 {
     mBlockChainNode.reset();
     mBlockChainNode = node;
+}
+
+std::string Did::GetPrivateKey(const std::string& seed)
+{
+    uint8_t* seedBuf;
+    int seedLen = Utils::Str2Hex(seed, &seedBuf);
+    char* privateKey = generateSubPrivateKey(seedBuf, seedLen, COIN_TYPE_ELA, EXTERNAL_CHAIN, mIndex);
+    free(seedBuf);
+
+    std::string ret = privateKey;
+    free(privateKey);
+    return ret;
 }
 
 }
