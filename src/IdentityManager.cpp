@@ -25,16 +25,14 @@ std::string IdentityManager::GetMnemonic(const std::string& language, const std:
     return str;
 }
 
-std::string IdentityManager::GetSeed(const std::string& mnemonic,
-        const std::string& language, const std::string& words, const std::string& mnemonicPassword)
+std::string IdentityManager::GetSeed(const std::string& mnemonic, const std::string& mnemonicPassword)
 {
-    if (mnemonic.empty() || language.empty() || (language.compare("english") && words.empty())) {
+    if (mnemonic.empty()) {
         return "";
     }
 
     void* seed;
-    int seedLen = getSeedFromMnemonic(&seed, mnemonic.c_str(),
-            language.c_str(), words.c_str(), mnemonicPassword.c_str());
+    int seedLen = getSeedFromMnemonic(&seed, mnemonic.c_str(), mnemonicPassword.c_str());
     if (seedLen == 0) {
         return "";
     }

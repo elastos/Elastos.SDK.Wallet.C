@@ -52,14 +52,8 @@ void TestSingleWallet()
 {
     int ret;
     const char* mnemonic = "血 坝 告 售 代 讨 转 枝 欧 旦 诚 抱";
-    const char* path = "/Users/huahua/repo/Elastos.SDK.Keypair.C/src/Data/mnemonic_chinese.txt";
-    char* words = readMnemonicFile(path);
-    if (!words) {
-        printf("read file failed\n");
-        return;
-    }
 
-    std::string seed = IdentityManager::GetSeed(mnemonic, "chinese", words, "");
+    std::string seed = IdentityManager::GetSeed(mnemonic, "");
     printf("seed:%s\n", seed.c_str());
 
     std::shared_ptr<Identity> identity;
@@ -67,28 +61,28 @@ void TestSingleWallet()
     printf("identity ret:%d\n", ret);
 
 
-    std::shared_ptr<BlockChainNode> node1 = std::make_shared<BlockChainNode>(TEST_NET_WALLET_SERVICE_URL);
-    std::shared_ptr<HDWallet> hdWallet;
-    ret = identity->CreateSingleAddressWallet(seed, node1, &hdWallet);
-    printf("hd wallet ret:%d\n", ret);
+    // std::shared_ptr<BlockChainNode> node1 = std::make_shared<BlockChainNode>(TEST_NET_WALLET_SERVICE_URL);
+    // std::shared_ptr<HDWallet> hdWallet;
+    // ret = identity->CreateSingleAddressWallet(seed, node1, &hdWallet);
+    // printf("hd wallet ret:%d\n", ret);
 
-    std::string publicKey = hdWallet->GetPublicKey(0, 0);
-    std::string hdSingleAddress = hdWallet->GetAddress(0, 0);
-    printf("hd address:%s\n", hdSingleAddress.c_str());
+    // std::string publicKey = hdWallet->GetPublicKey(0, 0);
+    // std::string hdSingleAddress = hdWallet->GetAddress(0, 0);
+    // printf("hd address:%s\n", hdSingleAddress.c_str());
 
-    long balance = hdWallet->GetBalance(hdSingleAddress);
-    printf("balance: %ld\n", balance);
+    // long balance = hdWallet->GetBalance(hdSingleAddress);
+    // printf("balance: %ld\n", balance);
 
-    hdWallet->SyncHistory();
+    // hdWallet->SyncHistory();
 
-    std::shared_ptr<BlockChainNode> node = std::make_shared<BlockChainNode>(TEST_NET_DID_SERVICE_URL);
-    std::shared_ptr<HDWallet> idChainWallet;
-    ret = identity->CreateSingleAddressWallet(seed, node, &idChainWallet);
+    std::shared_ptr<BlockChainNode> node = std::make_shared<BlockChainNode>(DID_SERVICE_URL);
+    // std::shared_ptr<HDWallet> idChainWallet;
+    // ret = identity->CreateSingleAddressWallet(seed, node, &idChainWallet);
 
-    balance = idChainWallet->GetBalance(hdSingleAddress);
-    printf("id chain balance: %ld\n", balance);
+    // balance = idChainWallet->GetBalance(hdSingleAddress);
+    // printf("id chain balance: %ld\n", balance);
 
-    idChainWallet->SyncHistory();
+    // idChainWallet->SyncHistory();
 
 
     // std::vector<Transaction> transactions;
@@ -113,10 +107,10 @@ void TestSingleWallet()
     // printf("txid: %s\n", txid.c_str());
 
 
-    std::string histories;
-    int count = hdWallet->GetHistoryCount(hdSingleAddress);
-    hdWallet->GetHistory(hdSingleAddress, 5, 0, false, histories);
-    printf("history: %s\n", histories.c_str());
+    // std::string histories;
+    // int count = hdWallet->GetHistoryCount(hdSingleAddress);
+    // hdWallet->GetHistory(hdSingleAddress, 5, 0, false, histories);
+    // printf("history: %s\n", histories.c_str());
 
     // balance = wallet->GetBalance();
     // printf("balance: %ld\n", balance);
@@ -135,12 +129,12 @@ void TestSingleWallet()
 
     didObj->SetNode(node);
 
-    std::string str("[{\"Key\": \"name\", \"Value\":\"alice\"}]");
-    std::string info = didObj->SignInfo(seed, str);
-    printf("signed info: %s\n", info.c_str());
+    // std::string str("[{\"Key\": \"name\", \"Value\":\"alice\"}]");
+    // std::string info = didObj->SignInfo(seed, str);
+    // printf("signed info: %s\n", info.c_str());
 
-    std::string encryptInfo = didObj->SignInfo(seed, str, true);
-    printf("encrypt signed info: %s\n", encryptInfo.c_str());
+    // std::string encryptInfo = didObj->SignInfo(seed, str, true);
+    // printf("encrypt signed info: %s\n", encryptInfo.c_str());
 
     // std::string enctyptInfo("[{\"Key\": \"PhoneNumber\", \"Value\":\"1234566789\"}]");
     // std::string txid = didObj->SetInfo(seed, enctyptInfo, idChainWallet, true);
@@ -156,14 +150,7 @@ void TestSingleWallet()
 std::string GetAddress()
 {
     const char* mnemonic = "督 辉 稿 谋 速 壁 阿 耗 瓷 仓 归 说";
-    const char* path = "/Users/huahua/repo/Elastos.SDK.Keypair.C/src/Data/mnemonic_chinese.txt";
-    char* words = readMnemonicFile(path);
-    if (!words) {
-        printf("read file failed\n");
-        return "";
-    }
-
-    std::string seed = IdentityManager::GetSeed(mnemonic, "chinese", words, "");
+    std::string seed = IdentityManager::GetSeed(mnemonic, "");
     printf("seed:%s\n", seed.c_str());
 
     std::shared_ptr<Identity> identity;
@@ -191,14 +178,7 @@ void TestHDWallet()
 {
     int ret;
     const char* mnemonic = "血 坝 告 售 代 讨 转 枝 欧 旦 诚 抱";
-    const char* path = "/Users/huahua/repo/Elastos.SDK.Keypair.C/src/Data/mnemonic_chinese.txt";
-    char* words = readMnemonicFile(path);
-    if (!words) {
-        printf("read file failed\n");
-        return;
-    }
-
-    std::string seed = IdentityManager::GetSeed(mnemonic, "chinese", words, "");
+    std::string seed = IdentityManager::GetSeed(mnemonic, "");
     printf("seed:%s\n", seed.c_str());
 
     std::shared_ptr<Identity> identity;
@@ -213,22 +193,22 @@ void TestHDWallet()
     // hdWallet->SyncHistory();
     // hdWallet->Recover();
 
-    int balance = hdWallet->GetBalance();
-    printf("balance: %d\n", balance);
+    long balance = hdWallet->GetBalance();
+    printf("balance: %ld\n", balance);
 
     // std::string addr = GetAddress();
     // printf("to addr: %s\n", addr.c_str());
-    std::vector<Transaction> transactions;
-    Transaction tx1("8SC6up2F6XFej1gzY1uuFrCxFevF5P5jFw", 10000000L);
-    transactions.push_back(tx1);
+    // std::vector<Transaction> transactions;
+    // Transaction tx1("8SC6up2F6XFej1gzY1uuFrCxFevF5P5jFw", 10000000L);
+    // transactions.push_back(tx1);
 
-    std::string txid;
-    ret = hdWallet->SendTransaction(transactions, "", seed, txid);
-    if (ret != E_WALLET_C_OK) {
-        printf("send transaction failed: %d\n", ret);
-        return;
-    }
-    printf("txid: %s\n", txid.c_str());
+    // std::string txid;
+    // ret = hdWallet->SendTransaction(transactions, "", seed, txid);
+    // if (ret != E_WALLET_C_OK) {
+    //     printf("send transaction failed: %d\n", ret);
+    //     return;
+    // }
+    // printf("txid: %s\n", txid.c_str());
 
     // std::vector<std::string> usedAddrs = hdWallet->GetUsedAddresses();
     // printf("used address:\n");
@@ -245,14 +225,7 @@ void TestMultiSignWallet()
     publicKeys.push_back("03b8d95fa2a863dcbd44bf288040df4c6cb9d674a61c4c1e3638ac515994c777e5");
 
     const char* mnemonic = "血 坝 告 售 代 讨 转 枝 欧 旦 诚 抱";
-    const char* path = "/Users/huahua/repo/Elastos.SDK.Keypair.C/src/Data/mnemonic_chinese.txt";
-    char* words = readMnemonicFile(path);
-    if (!words) {
-        printf("read file failed\n");
-        return;
-    }
-
-    std::string seed = IdentityManager::GetSeed(mnemonic, "chinese", words, "");
+    std::string seed = IdentityManager::GetSeed(mnemonic, "");
     printf("seed:%s\n", seed.c_str());
 
     std::shared_ptr<Identity> identity;

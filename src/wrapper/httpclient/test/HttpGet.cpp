@@ -15,11 +15,8 @@ int main( int argc, char **argv )
 	ret = httpClient.Url("haa");
 	std::cout << "return code: " << ret << std::endl;
 	std::cout << "=================="<< std::endl;
-		
-	ret = httpClient.Url("https://hw-did-api-test.elastos.org/api/1/currHeight");
-	std::cout << "return code: " << ret << std::endl;
 
-	ret = httpClient.SetTimeout(5000);
+	ret = httpClient.Url("https://hw-did-api-test.elastos.org/api/1/currHeight");
 	std::cout << "return code: " << ret << std::endl;
 
 	ret = httpClient.SetHeader("Accept-Encoding", "identity");

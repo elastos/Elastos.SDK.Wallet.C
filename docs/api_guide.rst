@@ -82,7 +82,7 @@ GetMnemonic
 GetSeed
 ~~~~~~~~~~~~~~~~~~~
 
-.. cpp:function:: static std::string GetSeed(const std::string& mnemonic, const std::string& language, const std::string& words, const std::string& mnemonicPassword)
+.. cpp:function:: static std::string GetSeed(const std::string& mnemonic, const std::string& mnemonicPassword)
 
   Get seed from mnemonic.
 
@@ -91,8 +91,6 @@ GetSeed
 
   **Parameter**
     :[in] mnemonic: 12 words, seperated by white space.
-    :[in] language: mnemonic language, for example english/chinese.
-    :[in] words: the words resource, seperated by \n, if the language is english, words should be empty string.
     :[in] mnemonicPassword: password of mnemonic, will get different seed if not empty.
 
 
