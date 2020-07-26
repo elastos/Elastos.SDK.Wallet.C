@@ -165,13 +165,13 @@ std::string Did::GetInfo(const std::string& key, bool encrypt, const std::string
 
         std::string privateKey = GetPrivateKey(seed);
         int len = 0;
-        char* decrypted = eciesDecrypt(privateKey.c_str(), property.mProperty.c_str(), &len);
+        unsigned char* decrypted = eciesDecrypt(privateKey.c_str(), property.mProperty.c_str(), &len);
         if (decrypted == NULL || len == 0) {
             Log::E("Did", "decrypt failed!\n");
             return "";
         }
 
-        value = decrypted;
+        value = (char*)decrypted;
         free(decrypted);
     }
     else {
@@ -224,7 +224,7 @@ int Did::GenDidUploadInfo(const std::string& json, bool encrypt, uint8_t** buf)
         if (!encrypt) continue;
 
         std::string value = properties[i]["Value"];
-        char* encrypted = eciesEncrypt(mPublicKey.c_str(), value.c_str());
+        char* encrypted = eciesEncrypt(mPublicKey.c_str(), (const unsigned char *)value.c_str(), value.size());
         properties[i]["Value"] = encrypted;
         free(encrypted);
     }
